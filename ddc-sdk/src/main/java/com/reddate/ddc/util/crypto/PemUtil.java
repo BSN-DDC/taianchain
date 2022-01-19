@@ -6,11 +6,15 @@ import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.bouncycastle.jce.spec.ECNamedCurveSpec;
 import org.bouncycastle.util.encoders.Base64;
 import org.fisco.bcos.web3j.crypto.ECKeyPair;
+import org.fisco.bcos.web3j.crypto.Keys;
+import org.fisco.bcos.web3j.utils.Account;
 import org.fisco.bcos.web3j.utils.Numeric;
 
 import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.interfaces.ECPrivateKey;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.*;
@@ -112,5 +116,33 @@ public class PemUtil {
         ECPublicKeySpec keySpec = new ECPublicKeySpec(ecPoint, params2);
         KeyFactory factory = KeyFactory.getInstance("ECDSA");
         return (ECPublicKey) factory.generatePublic(keySpec);
+    }
+
+    /**
+     * 创建账户
+     *
+     * @throws InvalidAlgorithmParameterException
+     * @throws NoSuchAlgorithmException
+     * @throws NoSuchProviderException
+     * @throws InvalidKeySpecException
+     */
+    public static Account createAccount() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
+        ECKeyPair keyPair = Keys.createEcKeyPair();
+        String privateKey = Numeric.toHexStringNoPrefix(keyPair.getPrivateKey());
+        String publicKey = Numeric.toHexStringNoPrefix(keyPair.getPublicKey());
+        String address = "0x" + Keys.getAddress(keyPair.getPublicKey());
+
+        ECPrivateKey ecPrivateKey = PemUtil.toEcPrivateKey(privateKey);
+        ECPublicKey ecPublicKey = PemUtil.toEcPublicKey(publicKey);
+
+        String ecPrivateKeyPem = PemUtil.formatToPem(ecPrivateKey.getEncoded(), "PRIVATE KEY");
+        String ecPublicKeyPem = PemUtil.formatToPem(ecPublicKey.getEncoded(), "PUBLIC KEY");
+
+        Account account = new Account();
+        account.setPrivateKey(ecPrivateKeyPem);
+        account.setPublicKey(ecPublicKeyPem);
+        account.setAddress(address);
+        return account;
+
     }
 }

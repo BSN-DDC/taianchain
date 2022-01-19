@@ -1,6 +1,5 @@
 package com.reddate.ddc.service;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.reddate.ddc.config.ConfigCache;
 import com.reddate.ddc.constant.*;
@@ -37,14 +36,13 @@ public class BlockEventService extends BaseService {
     public BlockEventService() {
         // 进行事件方法与实体类的绑定
         eventBeanMap.put(AuthorityFunctions.AddAccountEvent, AddAccountEventBean.class);
-        eventBeanMap.put(AuthorityFunctions.UpdateAccountEvent, UpdateAccountEventBean.class);
         eventBeanMap.put(AuthorityFunctions.UpdateAccountStateEvent, UpdateAccountStateEventBean.class);
 
         eventBeanMap.put(ChargeFunctions.RechargeEvent,ReChargeEventBean.class);
         eventBeanMap.put(ChargeFunctions.PayEvent, PayEventBean.class);
         eventBeanMap.put(ChargeFunctions.SetFeeEvent, SetFeeEventBean.class);
-        eventBeanMap.put(ChargeFunctions.DeleteFeeEvent, DeleteFeeEventBean.class);
-        eventBeanMap.put(ChargeFunctions.DeleteDDCEvent, DeleteDDCEventBean.class);
+        eventBeanMap.put(ChargeFunctions.DelFeeEvent, DeleteFeeEventBean.class);
+        eventBeanMap.put(ChargeFunctions.DelDDCEvent, DeleteDDCEventBean.class);
 
         eventBeanMap.put(DDC721Functions.DDC721TransferEvent, DDC721TransferEventBean.class);
         eventBeanMap.put(DDC721Functions.DDC721FreezeEvent, DDC721FreezeEventBean.class);
@@ -166,11 +164,11 @@ public class BlockEventService extends BaseService {
                     arrayList.add(eventBean);
                 } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException e) {
                     e.printStackTrace();
-                    try {
-                        throw e;
-                    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException ex) {
-                        ex.printStackTrace();
-                    }
+//                    try {
+//                        throw e;
+//                    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException ex) {
+//                        ex.printStackTrace();
+//                    }
                 }
             }
         }

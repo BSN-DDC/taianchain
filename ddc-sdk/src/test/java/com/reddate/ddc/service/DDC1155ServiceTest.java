@@ -1,13 +1,12 @@
 package com.reddate.ddc.service;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.reddate.ddc.DDCSdkClient;
 import com.reddate.ddc.config.ConfigCache;
 import com.reddate.ddc.dto.taianchain.TransactionRecepitBean;
 import com.reddate.ddc.listener.Secp256K1SignEventListener;
-import com.reddate.ddc.listener.SignEvent;
-import com.reddate.ddc.listener.SignEventListener;
 import com.reddate.ddc.util.AnalyzeChainInfoUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.fisco.bcos.web3j.crypto.gm.sm2.util.encoders.Hex;
@@ -21,23 +20,23 @@ import static org.junit.Assert.assertNotNull;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 class DDC1155ServiceTest {
 
-    String privateKey = "-----BEGIN PRIVATE KEY-----\n" +
-            "MIGEAgEAMBAGByqGSM49AgAABSuBBAAKBG0wawIBAQQgEWL4mAyD0V4cKcZ+RXS+\n" +
-            "Y0b/Wt3WYOuHNynQQwCaGPGhRANCAAQojPfT83xRrijQNk6CXq1/w61/ZU5GC6CE\n" +
-            "BTq8PEeUyqngCJCN0gkfRU1IEmusAsIGJb3ff2cQRvYTBqcismv5\n" +
+    static String operatorPrivateKey = "-----BEGIN PRIVATE KEY-----\n" +
+            "MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgseEExMPXTcSpExzejzYZ\n" +
+            "wcLWikQtoZ3BRhWergMR2LGhRANCAATCEQFr8dEbUI6ZYChl4+pE3UopdpWknZiv\n" +
+            "rK7WWNymFHQQyIN15nsq5ZZat8G+iPNLtCdRSaU3h769ObArmg11\n" +
             "-----END PRIVATE KEY-----\n";
-
 
     static String publicKey = "-----BEGIN PUBLIC KEY-----\n" +
             "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEjRHf7EbOKvUwRJW/kn4N6Vmf++n/gBu0\n" +
             "WEBUzovj+TAxwvgB26tCfoqk9X2gTdjwwKh6o/hvtx66EDB9GlzgTA==\n" +
             "-----END PUBLIC KEY-----\n";
 
+    static String address = "0x81072375a506581CADBd90734Bd00A20CdDbE48b";
+    
     static {
         DDCSdkClient sdk = new DDCSdkClient();
         sdk.init();
@@ -47,7 +46,7 @@ class DDC1155ServiceTest {
         DDC1155Service ddc1155Service = null;
         try {
             ddc1155Service = new DDC1155Service(
-                    new Secp256K1SignEventListener(privateKey, publicKey));
+                    new Secp256K1SignEventListener(operatorPrivateKey, publicKey));
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -76,7 +75,7 @@ class DDC1155ServiceTest {
 
     @Test
     void mint() throws Exception {
-        String tx = getDDC1155Service().mint("0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", new BigInteger("100"), "Token1");
+        String tx = getDDC1155Service().mint(address,"0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", new BigInteger("100"), "Token1","test additional data".getBytes());
         log.info(tx);
         assertNotNull(tx);
         log.info(analyzeRecepit(tx));
@@ -84,10 +83,10 @@ class DDC1155ServiceTest {
 
     @Test
     void mintBatch() throws Exception {
-        Multimap<BigInteger, String> map = HashMultimap.create();
-        map.put(new BigInteger("100"),"0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63");
-        map.put(new BigInteger("100"),"0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63");
-        String tx = getDDC1155Service().mintBatch("0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63",map);
+        Multimap<BigInteger, String> map = ArrayListMultimap.create();
+        map.put(new BigInteger("1"),"0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63");
+        map.put(new BigInteger("1"),"0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e2");
+        String tx = getDDC1155Service().mintBatch(address,"0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63",map,"test additional data".getBytes());
         log.info(tx);
         assertNotNull(tx);
         log.info(analyzeRecepit(tx));
@@ -95,7 +94,7 @@ class DDC1155ServiceTest {
 
     @Test
     void setApprovalForAll() throws Exception {
-        String tx = getDDC1155Service().setApprovalForAll("0x179319b482320c74be043bf0fb3f00411ca12f8d", true);
+        String tx = getDDC1155Service().setApprovalForAll(address,"0x179319b482320c74be043bf0fb3f00411ca12f8d", true);
         log.info(tx);
         assertNotNull(tx);
         log.info(analyzeRecepit(tx));
@@ -105,7 +104,7 @@ class DDC1155ServiceTest {
     void safeTransferFrom() throws Exception {
         byte[] data = new byte[1];
         data[0] = 1;
-        String tx = getDDC1155Service().safeTransferFrom("0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0x179319b482320c74be043bf0fb3f00411ca12f8d", new BigInteger("18"), new BigInteger("1"), data);
+        String tx = getDDC1155Service().safeTransferFrom(address,"0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0x5c5101afe03b416b9735f40ddc3ba7b0c354a5a0", new BigInteger("18"), new BigInteger("1"), data);
         log.info(tx);
         assertNotNull(tx);
         log.info(analyzeRecepit(tx));
@@ -118,8 +117,8 @@ class DDC1155ServiceTest {
         data[0] = 1;
 
         Map<BigInteger,BigInteger> ddcInfos = new HashMap<>();
-        ddcInfos.put(new BigInteger("23"),new BigInteger("23"));
-        String tx = getDDC1155Service().safeBatchTransferFrom("0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0x179319b482320c74be043bf0fb3f00411ca12f8d", ddcInfos, data);
+        ddcInfos.put(new BigInteger("14"),new BigInteger("1"));
+        String tx = getDDC1155Service().safeBatchTransferFrom(address,"0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0x5c5101afe03b416b9735f40ddc3ba7b0c354a5a0", ddcInfos, data);
         log.info(tx);
         assertNotNull(tx);
         log.info(analyzeRecepit(tx));
@@ -127,7 +126,7 @@ class DDC1155ServiceTest {
 
     @Test
     void freeze() throws Exception {
-        String tx = getDDC1155Service().freeze(new BigInteger("18"));
+        String tx = getDDC1155Service().freeze(address,new BigInteger("18"));
         log.info(tx);
         assertNotNull(tx);
         log.info(analyzeRecepit(tx));
@@ -137,20 +136,18 @@ class DDC1155ServiceTest {
 
     @Test
     void unFreeze() throws Exception {
-        String tx = getDDC1155Service().unFreeze(new BigInteger("18"));
+        String tx = getDDC1155Service().unFreeze(address,new BigInteger("18"));
         log.info(tx);
         assertNotNull(tx);
         log.info(analyzeRecepit(tx));
-        assertNotNull(tx);
     }
 
     @Test
     void burn() throws Exception {
-        String tx = getDDC1155Service().burn("0x179319b482320c74be043bf0fb3f00411ca12f8d", new BigInteger("18"));
+        String tx = getDDC1155Service().burn(address,"0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", new BigInteger("21"));
         log.info(tx);
         assertNotNull(tx);
         log.info(analyzeRecepit(tx));
-        assertNotNull(tx);
     }
 
     @Test
@@ -158,7 +155,7 @@ class DDC1155ServiceTest {
         ArrayList<BigInteger> arrayList = new ArrayList();
         arrayList.add(new BigInteger("23"));
 
-        String tx = getDDC1155Service().burnBatch("0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", arrayList);
+        String tx = getDDC1155Service().burnBatch(address,"0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", arrayList);
         log.info(tx);
         assertNotNull(tx);
         log.info(analyzeRecepit(tx));
@@ -173,7 +170,7 @@ class DDC1155ServiceTest {
 
     @Test
     void balanceOfBatch() throws Exception {
-        Multimap<String, BigInteger> map = HashMultimap.create();
+        Multimap<String, BigInteger> map = ArrayListMultimap.create();
         for (int i = 0; i < 100; i++) {
             map.put("0x5c5101aFe03B416b9735F40dDc3ba7B0c354A5A0",new BigInteger(String.valueOf(i)));
         }

@@ -33,20 +33,10 @@ contract:
 ```
     // 生成链账户
     public void generatePem() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-        ECKeyPair keyPair = Keys.createEcKeyPair();
-        String privateKey = Numeric.toHexStringNoPrefix(keyPair.getPrivateKey());
-        String publicKey = Numeric.toHexStringNoPrefix(keyPair.getPublicKey());
-        String address = "0x" + Keys.getAddress(keyPair.getPublicKey());
-
-        ECPrivateKey ecPrivateKey = PemUtil.toEcPrivateKey(privateKey);
-        ECPublicKey ecPublicKey = PemUtil.toEcPublicKey(publicKey);
-
-        String ecPrivateKeyPem = PemUtil.formatToPem(ecPrivateKey.getEncoded(), "PRIVATE KEY");
-        String ecPublicKeyPem = PemUtil.formatToPem(ecPublicKey.getEncoded(), "PUBLIC KEY");
-
-        log.info("ecPrivateKeyPem: \n{}",ecPrivateKeyPem);
-        log.info("ecPublicKeyPem: \n{}",ecPublicKeyPem);
-        log.info("address: \n{}",address);
+        Account account = PemUtil.createAccount();
+        System.out.println(account.getPrivateKey());
+        System.out.println(account.getPublicKey());
+        System.out.println(account.getAddress());
     }
 
 ```
@@ -76,17 +66,12 @@ contract:
 ```
     // 通过合约的实例进行该合约内方法的调用，此处以发行、流转一个DDC721为例
     void mint() throws Exception {
-        for (int i = 0; i < 1; i++) {
-            String tx = getDDC721Service().mint("0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63","0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63");
-            log.info(tx);
-        }
+        String tx = getDDC721Service().mint(address, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63");
+        log.info(tx);
     }
     
-    void safeTransferFrom() throws Exception {
-        byte[] data = new byte[1];
-        data[0] = 1;
-        String tx = getDDC721Service().safeTransferFrom("0xb0031aa7725a6828bcce4f0b90cfe451c31c1e63","0x179319b482320c74be043bf0fb3f00411ca12f8d",new BigInteger("150"),data);
+     void transferFrom() throws Exception {
+        String tx = getDDC721Service().transferFrom(address, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0x5c5101afe03b416b9735f40ddc3ba7b0c354a5a0", new BigInteger("1"));
         log.info(tx);
-        assertNotNull(tx);
     }
 ```

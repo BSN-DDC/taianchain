@@ -37,7 +37,9 @@ public class ConfigInfo {
     
     private String publicKey;
     
-    private Long queryRecepitWaitTime = 1000L;
+    private Long queryRecepitWaitTime = 300L;
+    
+    private Integer queryRecepitRetryCount = 10;
 
 	public Integer getConTimeout() {
 		return conTimeout;
@@ -181,6 +183,14 @@ public class ConfigInfo {
 
 	public void setQueryRecepitWaitTime(Long queryRecepitWaitTime) {
 		this.queryRecepitWaitTime = queryRecepitWaitTime;
+	}
+
+	public Integer getQueryRecepitRetryCount() {
+		return queryRecepitRetryCount;
+	}
+
+	public void setQueryRecepitRetryCount(Integer queryRecepitRetryCount) {
+		this.queryRecepitRetryCount = queryRecepitRetryCount;
 	}
 	
 }

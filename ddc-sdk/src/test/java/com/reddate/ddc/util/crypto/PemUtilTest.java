@@ -3,6 +3,7 @@ package com.reddate.ddc.util.crypto;
 import lombok.extern.slf4j.Slf4j;
 import org.fisco.bcos.web3j.crypto.ECKeyPair;
 import org.fisco.bcos.web3j.crypto.Keys;
+import org.fisco.bcos.web3j.utils.Account;
 import org.fisco.bcos.web3j.utils.Numeric;
 import org.junit.jupiter.api.Test;
 
@@ -19,20 +20,10 @@ class PemUtilTest {
 
     @Test
     public void generatePem() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
-        ECKeyPair keyPair = Keys.createEcKeyPair();
-        String privateKey = Numeric.toHexStringNoPrefix(keyPair.getPrivateKey());
-        String publicKey = Numeric.toHexStringNoPrefix(keyPair.getPublicKey());
-        String address = "0x" + Keys.getAddress(keyPair.getPublicKey());
-
-        ECPrivateKey ecPrivateKey = PemUtil.toEcPrivateKey(privateKey);
-        ECPublicKey ecPublicKey = PemUtil.toEcPublicKey(publicKey);
-
-        String ecPrivateKeyPem = PemUtil.formatToPem(ecPrivateKey.getEncoded(), "PRIVATE KEY");
-        String ecPublicKeyPem = PemUtil.formatToPem(ecPublicKey.getEncoded(), "PUBLIC KEY");
-
-        System.out.println(ecPrivateKeyPem);
-        System.out.println(ecPublicKeyPem);
-        System.out.println(address);
+        Account account = PemUtil.createAccount();
+        System.out.println(account.getPrivateKey());
+        System.out.println(account.getPublicKey());
+        System.out.println(account.getAddress());
     }
 
 }

@@ -62,6 +62,9 @@ public class ConfigUtils {
 	
 	public static final String QUERY_RECEPIT_WAINT_TIME = "queryRecepitWaitTime";
 	
+	public static final String QUERY_RECEPIT_RETRY_COUNT = "queryRecepitRetryCount";
+	
+	
 	/**
 	 * 解析默认位置的位置文件，并验证配置项，组装成配置对象
 	 * 
@@ -89,6 +92,7 @@ public class ConfigUtils {
 		String authorityLogicAddress = (String)contractMap.get(AUTHORITY_LOGIC_ADDR);
 		String chargeLogicAddress = (String)contractMap.get(CHARGE_LOGIC_ADDR);
 		Integer queryRecepitWaitTime = (Integer)contractMap.get(QUERY_RECEPIT_WAINT_TIME);
+		Integer queryRecepitRetryCount = (Integer)contractMap.get(QUERY_RECEPIT_RETRY_COUNT);
 		
 		ConfigInfo configInfo = new ConfigInfo();
 		
@@ -109,6 +113,10 @@ public class ConfigUtils {
 		
 		if(queryRecepitWaitTime != null) {
 			configInfo.setQueryRecepitWaitTime(new Long(queryRecepitWaitTime.intValue()));
+		}
+		
+		if(queryRecepitRetryCount != null) {
+			configInfo.setQueryRecepitRetryCount(queryRecepitRetryCount);
 		}
 		
 		if(isEmpty(ddc721Address)) {

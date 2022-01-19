@@ -2,8 +2,18 @@ package com.reddate.ddc.listener;
 
 public class SignEvent {
 
+	private String sender;
+	
 	private String encodeTransaction;
 	
+	public String getSender() {
+		return sender;
+	}
+
+	public void setSender(String sender) {
+		this.sender = sender;
+	}
+
 	public String getEncodeTransaction() {
 		return encodeTransaction;
 	}

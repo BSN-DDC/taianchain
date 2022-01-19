@@ -8,10 +8,10 @@ import java.math.BigInteger;
 public class PayEventBean extends BaseEventBean {
 	
 	/** 链账户地址 */
-    String from;
+    String payer;
     
     /** 业务主合约 */
-    String ddcAddr;
+    String payee;
     
     /** 方法签名  */
     String sig;

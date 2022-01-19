@@ -36,6 +36,8 @@ public enum ErrorMessage {
     SIGN_METHOD_EMPTY(1027,"sign method is empty"),
     NO_SIGN_EVENT_LISTNER(1028,"not register sign event listener"),
     ROLE_IS_EMPTY(1029, "role is empty"),
+    SENDER_IS_EMPTY(1030, "sender is empty"),
+    SENDER_IS_NOT_ADDRESS_FORMAT(1031, "sender is not a standard address format"),
     
     SIG_IS_EMPTY(1018, "sig is empty"),
     SIG_IS_NOT_4BYTE_HASH(1019, "sig is not 4 byte hash"),

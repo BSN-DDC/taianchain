@@ -57,9 +57,9 @@ class AnalyzeChainInfoUtilsTest {
             eventArrayLisy.addAll(analyzeAddAccountEvent(map));
         }
 
-        if (map.containsKey(AuthorityFunctions.UpdateAccountEvent)) {
-            eventArrayLisy.addAll(analyzeUpdateAccountEvent(map));
-        }
+//        if (map.containsKey(AuthorityFunctions.UpdateAccountEvent)) {
+//            eventArrayLisy.addAll(analyzeUpdateAccountEvent(map));
+//        }
 
         if (map.containsKey(AuthorityFunctions.UpdateAccountStateEvent)) {
             eventArrayLisy.addAll(analyzeUpdateAccountStateEvent(map));
@@ -83,13 +83,7 @@ class AnalyzeChainInfoUtilsTest {
             AddAccountEventBean accountEventBean = new AddAccountEventBean();
             accountEventBean.setCaller((String) addAccountList.get(0).getData());
             accountEventBean.setAccount((String) addAccountList.get(1).getData());
-            accountEventBean.setAccountDID((String) addAccountList.get(2).getData());
-            accountEventBean.setAccountName((String) addAccountList.get(3).getData());
-            accountEventBean.setAccountRole((BigInteger) addAccountList.get(4).getData());
-            accountEventBean.setLeaderDID((String) addAccountList.get(5).getData());
-            accountEventBean.setPlatformState((BigInteger) addAccountList.get(6).getData());
-            accountEventBean.setOperatorState((BigInteger) addAccountList.get(7).getData());
-            accountEventBean.setField((String) addAccountList.get(8).getData());
+
             addAccountEventBeanArrayList.add(accountEventBean);
         }
 
@@ -98,17 +92,17 @@ class AnalyzeChainInfoUtilsTest {
     }
 
 
-    public ArrayList analyzeUpdateAccountEvent(Map<String, List<List<EventResultEntity>>> map) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException {
-        List<List<EventResultEntity>> updateAccountLists = map.get(AuthorityFunctions.UpdateAccountEvent);
-        ArrayList<UpdateAccountEventBean> addAccountEventBeanArrayList = new ArrayList<>(updateAccountLists.size());
-        for (List<EventResultEntity> addAccountList : updateAccountLists) {
-            UpdateAccountEventBean accountEventBean = assembleBeanByReflect(addAccountList, UpdateAccountEventBean.class);
-            addAccountEventBeanArrayList.add(accountEventBean);
-        }
-
-        map.remove(AuthorityFunctions.UpdateAccountEvent);
-        return addAccountEventBeanArrayList;
-    }
+//    public ArrayList analyzeUpdateAccountEvent(Map<String, List<List<EventResultEntity>>> map) throws IllegalAccessException, InvocationTargetException, NoSuchMethodException, InstantiationException {
+//        List<List<EventResultEntity>> updateAccountLists = map.get(AuthorityFunctions.UpdateAccountEvent);
+//        ArrayList<UpdateAccountEventBean> addAccountEventBeanArrayList = new ArrayList<>(updateAccountLists.size());
+//        for (List<EventResultEntity> addAccountList : updateAccountLists) {
+//            UpdateAccountEventBean accountEventBean = assembleBeanByReflect(addAccountList, UpdateAccountEventBean.class);
+//            addAccountEventBeanArrayList.add(accountEventBean);
+//        }
+//
+//        map.remove(AuthorityFunctions.UpdateAccountEvent);
+//        return addAccountEventBeanArrayList;
+//    }
 
 
     public ArrayList analyzeUpdateAccountStateEvent(Map<String, List<List<EventResultEntity>>> map) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {

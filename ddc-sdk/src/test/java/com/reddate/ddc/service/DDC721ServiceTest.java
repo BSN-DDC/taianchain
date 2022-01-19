@@ -20,20 +20,25 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 class DDC721ServiceTest {
 
+    //0x81072375a506581CADBd90734Bd00A20CdDbE48b
     String privateKey = "-----BEGIN PRIVATE KEY-----\n" +
-            "MIGEAgEAMBAGByqGSM49AgAABSuBBAAKBG0wawIBAQQgEWL4mAyD0V4cKcZ+RXS+\n" +
-            "Y0b/Wt3WYOuHNynQQwCaGPGhRANCAAQojPfT83xRrijQNk6CXq1/w61/ZU5GC6CE\n" +
-            "BTq8PEeUyqngCJCN0gkfRU1IEmusAsIGJb3ff2cQRvYTBqcismv5\n" +
-            "-----END PRIVATE KEY-----\n";
+            "MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgseEExMPXTcSpExzejzYZ\n" +
+            "wcLWikQtoZ3BRhWergMR2LGhRANCAATCEQFr8dEbUI6ZYChl4+pE3UopdpWknZiv\n" +
+            "rK7WWNymFHQQyIN15nsq5ZZat8G+iPNLtCdRSaU3h769ObArmg11\n" +
+            "-----END PRIVATE KEY-----";
 
-    static String publicKey = "-----BEGIN PUBLIC KEY-----\n" +
+    String publicKey = "-----BEGIN PUBLIC KEY-----\n" +
             "MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEjRHf7EbOKvUwRJW/kn4N6Vmf++n/gBu0\n" +
             "WEBUzovj+TAxwvgB26tCfoqk9X2gTdjwwKh6o/hvtx66EDB9GlzgTA==\n" +
-            "-----END PUBLIC KEY-----\n";
+            "-----END PUBLIC KEY-----";
+
+    String address = "0x81072375a506581CADBd90734Bd00A20CdDbE48b";
+
     static {
         DDCSdkClient sdk = new DDCSdkClient();
         sdk.init();
     }
+
     private DDC721Service getDDC721Service() {
         DDC721Service ddc721Service = null;
         try {
@@ -66,8 +71,16 @@ class DDC721ServiceTest {
 
     @Test
     void mint() throws Exception {
+        String tx = getDDC721Service().mint(address, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63");
+        log.info(tx);
+        log.info(analyzeRecepit(tx));
+        assertNotNull(tx);
+    }
+
+    @Test
+    void safeMint() throws Exception {
         for (int i = 0; i < 1; i++) {
-            String tx = getDDC721Service().mint("0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63","0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63");
+            String tx = getDDC721Service().safeMint(address, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "test additional data".getBytes());
             log.info(tx);
             log.info(analyzeRecepit(tx));
             assertNotNull(tx);
@@ -77,7 +90,7 @@ class DDC721ServiceTest {
 
     @Test
     void approve() throws Exception {
-        String tx = getDDC721Service().approve("0x179319b482320c74be043bf0fb3f00411ca12f8d",new BigInteger("150"));
+        String tx = getDDC721Service().approve(address, "0x179319b482320c74be043bf0fb3f00411ca12f8d", new BigInteger("150"));
         log.info(tx);
         log.info(analyzeRecepit(tx));
         assertNotNull(tx);
@@ -92,14 +105,14 @@ class DDC721ServiceTest {
 
     @Test
     void setApprovalForAll() throws Exception {
-        String tx = getDDC721Service().setApprovalForAll("0x179319b482320c74be043bf0fb3f00411ca12f8d",true);
+        String tx = getDDC721Service().setApprovalForAll(address, "0x179319b482320c74be043bf0fb3f00411ca12f8d", true);
         log.info(tx);
         assertNotNull(tx);
     }
 
     @Test
     void isApprovedForAll() throws Exception {
-        Boolean tx = getDDC721Service().isApprovedForAll("0xf87e284379405b47f0be5317e3c7fcb436985843","0x81072375a506581cadbd90734bd00a20cddbe48b");
+        Boolean tx = getDDC721Service().isApprovedForAll("0xf87e284379405b47f0be5317e3c7fcb436985843", "0x81072375a506581cadbd90734bd00a20cddbe48b");
         log.info(String.valueOf(tx));
         assertNotNull(tx);
     }
@@ -108,7 +121,7 @@ class DDC721ServiceTest {
     void safeTransferFrom() throws Exception {
         byte[] data = new byte[1];
         data[0] = 1;
-        String tx = getDDC721Service().safeTransferFrom("0xb0031aa7725a6828bcce4f0b90cfe451c31c1e63","0x179319b482320c74be043bf0fb3f00411ca12f8d",new BigInteger("150"),data);
+        String tx = getDDC721Service().safeTransferFrom(address, "0xb0031aa7725a6828bcce4f0b90cfe451c31c1e63", "0x5c5101afe03b416b9735f40ddc3ba7b0c354a5a0", new BigInteger("150"), data);
         log.info(tx);
         log.info(analyzeRecepit(tx));
         assertNotNull(tx);
@@ -116,14 +129,15 @@ class DDC721ServiceTest {
 
     @Test
     void transferFrom() throws Exception {
-        String tx = getDDC721Service().transferFrom("0x5f696a2b62bea6db2ab0d2e8a26ca8acf4307d55","0x179319b482320c74be043bf0fb3f00411ca12f8d",new BigInteger("132"));
+        String tx = getDDC721Service().transferFrom(address, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0x5c5101afe03b416b9735f40ddc3ba7b0c354a5a0", new BigInteger("1"));
         log.info(tx);
         assertNotNull(tx);
+        analyzeRecepit(tx);
     }
 
     @Test
     void freeze() throws Exception {
-        String tx = getDDC721Service().freeze(new BigInteger("132"));
+        String tx = getDDC721Service().freeze(address, new BigInteger("132"));
         log.info(tx);
         log.info(analyzeRecepit(tx));
         assertNotNull(tx);
@@ -132,7 +146,7 @@ class DDC721ServiceTest {
 
     @Test
     void unFreeze() throws Exception {
-        String tx = getDDC721Service().unFreeze(new BigInteger("132"));
+        String tx = getDDC721Service().unFreeze(address, new BigInteger("132"));
         log.info(tx);
         log.info(analyzeRecepit(tx));
         assertNotNull(tx);
@@ -140,7 +154,7 @@ class DDC721ServiceTest {
 
     @Test
     void burn() throws Exception {
-        String tx = getDDC721Service().burn(new BigInteger("134"));
+        String tx = getDDC721Service().burn(address, new BigInteger("134"));
         log.info(tx);
         log.info(analyzeRecepit(tx));
         assertNotNull(tx);
@@ -169,7 +183,7 @@ class DDC721ServiceTest {
 
     @Test
     void name() throws Exception {
-    	String name = getDDC721Service().name();
+        String name = getDDC721Service().name();
         log.info(name);
         assertNotNull(name);
         log.info(analyzeRecepit(name));
@@ -177,14 +191,14 @@ class DDC721ServiceTest {
 
     @Test
     void symbol() throws Exception {
-    	String symbol = getDDC721Service().symbol();
+        String symbol = getDDC721Service().symbol();
         log.info(symbol);
         assertNotNull(symbol);
     }
 
     @Test
     void ddcURI() throws Exception {
-    	String ddcURI = getDDC721Service().ddcURI(new BigInteger("177423"));
+        String ddcURI = getDDC721Service().ddcURI(new BigInteger("1"));
         log.info(ddcURI);
         // assertNotNull(ddcURI);
     }

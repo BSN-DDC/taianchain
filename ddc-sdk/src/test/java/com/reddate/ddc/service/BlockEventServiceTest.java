@@ -23,7 +23,7 @@ class BlockEventServiceTest {
     @Test
     void getBlockEvent() throws BaseException, IOException, InterruptedException {
         ArrayList<Object> result = new ArrayList<>();
-        for (int i = 99743; i < 99744; i++) {
+        for (int i = 588094; i < 588095; i++) {
             result.addAll(blockEventService.getBlockEvent(String.valueOf(i)));
         }
         log.info("");

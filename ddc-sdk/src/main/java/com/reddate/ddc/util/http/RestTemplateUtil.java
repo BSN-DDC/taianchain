@@ -1,7 +1,9 @@
 package com.reddate.ddc.util.http;
 
 import com.alibaba.fastjson.JSONObject;
+import com.reddate.ddc.constant.FiscoFunctions;
 import lombok.extern.slf4j.Slf4j;
+import org.fisco.bcos.web3j.utils.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.FileSystemResource;
@@ -30,6 +32,11 @@ public class RestTemplateUtil {
         // Requirements need to be passed in form-data format
         header.set("charset", "UTF-8");
         header.set("Content-Type", "application/json");
+
+        if (!Strings.isEmpty(FiscoFunctions.xApiKey)) {
+            header.set("x-api-key",FiscoFunctions.xApiKey);
+        }
+
 //        header.setContentType(MediaType.APPLICATION_JSON);
         String value = JSONObject.toJSONString(params);
 

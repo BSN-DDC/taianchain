@@ -29,7 +29,7 @@ public class BaseService {
 
     protected SignEventListener signEventListener;
 
-
+    public static final String ZeroAddress = "0x0000000000000000000000000000000000000000";
     /**
      * 组装交易
      *
@@ -41,7 +41,7 @@ public class BaseService {
      * @return ReqJsonRpcBean
      * @throws Exception Exception
      */
-    public ReqJsonRpcBean assembleTransaction(BigInteger blockHeight, String abi, String contractAddress, String funcName, ArrayList<Object> params) throws Exception {
+    public ReqJsonRpcBean assembleTransaction(String sender, BigInteger blockHeight, String abi, String contractAddress, String funcName, ArrayList<Object> params) throws Exception {
         ReqTransBean reqTransBean = new ReqTransBean();
         reqTransBean.setGroupId(1);
         reqTransBean.setBlockNumber(blockHeight);
@@ -55,7 +55,13 @@ public class BaseService {
         	throw new DDCException(ErrorMessage.NO_SIGN_EVENT_LISTNER);
         }
 
-        byte[] signedResult = SignedTransactionsUtils.buildTrans(reqTransBean, signEventListener, blockHeight);
+        if(sender == null) {
+        	log.error("assembleTransaction {}",ErrorMessage.SENDER_IS_EMPTY);
+        	throw new DDCException(ErrorMessage.SENDER_IS_EMPTY);
+        }
+        
+        
+        byte[] signedResult = SignedTransactionsUtils.buildTrans(reqTransBean, signEventListener, sender, blockHeight);
 
         ReqJsonRpcBean reqJsonRpcBean = new ReqJsonRpcBean();
         reqJsonRpcBean.setMethod(FiscoFunctions.SendRawTransaction);
@@ -130,10 +136,20 @@ public class BaseService {
      * @throws TransactionException TransactionException
      */
     public InputAndOutputResult analyzeTransactionRecepitOutput(String abi, String bin, String hash) throws InterruptedException, BaseException, TransactionException {
-        log.debug("before query transaction recepit, wait for {} millis",ConfigCache.get().getQueryRecepitWaitTime());
-    	Thread.sleep(ConfigCache.get().getQueryRecepitWaitTime());
-        TransactionRecepitBean transactionRecepitBean = getTransactionRecepit(hash);
-
+    	TransactionRecepitBean transactionRecepitBean = getTransactionRecepit(hash);
+    	if(transactionRecepitBean == null) {
+    		Long queryRecepitTimeout = ConfigCache.get().getQueryRecepitWaitTime();
+            Integer queryRecepitRetryCount = ConfigCache.get().getQueryRecepitRetryCount();
+            log.debug("query transaction recepit, wait for {} millis, max retry times {}",queryRecepitTimeout,queryRecepitRetryCount);
+            for(int i = 0; i < queryRecepitRetryCount; i++) {
+            	Thread.sleep(queryRecepitTimeout);
+            	transactionRecepitBean = getTransactionRecepit(hash);
+            	if(transactionRecepitBean != null) {
+            		break;
+            	}
+            }
+    	}
+        
         if (null == transactionRecepitBean) {
             log.error("analyzeTransactionRecepitOutput {}",ErrorMessage.REQUEST_FAILED);
             throw new DDCException(ErrorMessage.REQUEST_FAILED);

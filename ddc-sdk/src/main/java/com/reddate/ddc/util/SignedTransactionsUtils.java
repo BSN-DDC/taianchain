@@ -40,12 +40,12 @@ public class SignedTransactionsUtils {
         return 1;
     }
 
-    public byte[] signTransaction(byte[] chainReqBody, SignEventListener signEventListener, BigInteger blockHeight) throws Exception {
+    public byte[] signTransaction(byte[] chainReqBody, SignEventListener signEventListener,String sender, BigInteger blockHeight) throws Exception {
         ReqTransBean reqTransBean = getReqTransBean(chainReqBody);
         if(signEventListener == null) {
         	throw new DDCException(ErrorMessage.NO_SIGN_EVENT_LISTNER);
         }
-        return buildTrans(reqTransBean, signEventListener, blockHeight);
+        return buildTrans(reqTransBean, signEventListener,sender, blockHeight);
     }
 
     private static ReqTransBean getReqTransBean(byte[] chainReqBody) {
@@ -54,7 +54,7 @@ public class SignedTransactionsUtils {
     }
 
 
-    public static byte[] buildTrans(ReqTransBean reqTransData, SignEventListener signEventListener, BigInteger blockHeight) throws Exception {
+    public static byte[] buildTrans(ReqTransBean reqTransData, SignEventListener signEventListener, String sender,BigInteger blockHeight) throws Exception {
         int algorithmType = EncryptType.ECDSA_TYPE;
         EncryptType encryptType = getEncryptTypeByAlgorithmType(algorithmType);
         String abi = reqTransData.getContractAbi();
@@ -85,12 +85,14 @@ public class SignedTransactionsUtils {
             } else {
                 // signedStr = TransactionAssembleManager.signMessageByEncryptType(encodeTransaction, signHandle.getKeyPair(), signHandle.getEncryptType());
             	SignEvent signEvent = new SignEvent();
+            	signEvent.setSender(sender);
             	signEvent.setEncodeTransaction(encodeTransaction);
             	signedStr = signEventListener.signEvent(signEvent);
             }
         } else {
             // signedStr = TransactionAssembleManager.signMessageByEncryptType(encodeTransaction, signHandle.getKeyPair(), signHandle.getEncryptType());
         	SignEvent signEvent = new SignEvent();
+        	signEvent.setSender(sender);
         	signEvent.setEncodeTransaction(encodeTransaction);
         	signedStr = signEventListener.signEvent(signEvent);
         }

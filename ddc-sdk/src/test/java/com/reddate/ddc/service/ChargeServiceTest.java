@@ -16,15 +16,17 @@ import com.reddate.ddc.listener.Secp256K1SignEventListener;
 public class ChargeServiceTest {
 
 	String privateKey = "-----BEGIN PRIVATE KEY-----\n" +
-			"MIGEAgEAMBAGByqGSM49AgAABSuBBAAKBG0wawIBAQQgEWL4mAyD0V4cKcZ+RXS+\n" +
-			"Y0b/Wt3WYOuHNynQQwCaGPGhRANCAAQojPfT83xRrijQNk6CXq1/w61/ZU5GC6CE\n" +
-			"BTq8PEeUyqngCJCN0gkfRU1IEmusAsIGJb3ff2cQRvYTBqcismv5\n" +
-			"-----END PRIVATE KEY-----\n";
+			"MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgseEExMPXTcSpExzejzYZ\n" +
+			"wcLWikQtoZ3BRhWergMR2LGhRANCAATCEQFr8dEbUI6ZYChl4+pE3UopdpWknZiv\n" +
+			"rK7WWNymFHQQyIN15nsq5ZZat8G+iPNLtCdRSaU3h769ObArmg11\n" +
+			"-----END PRIVATE KEY-----";
 
 	String publicKey = "-----BEGIN PUBLIC KEY-----\n" +
 			"MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEjRHf7EbOKvUwRJW/kn4N6Vmf++n/gBu0\n" +
 			"WEBUzovj+TAxwvgB26tCfoqk9X2gTdjwwKh6o/hvtx66EDB9GlzgTA==\n" +
 			"-----END PUBLIC KEY-----";
+	
+	String sender = "0x81072375a506581cadbd90734bd00a20cddbe48b";
 	static {
 		DDCSdkClient sdk = new DDCSdkClient();
 		sdk.init();
@@ -38,7 +40,7 @@ public class ChargeServiceTest {
 		String to = "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63";
 		BigInteger amount = new BigInteger("300000");
 		
-		String txhash = chargeService.recharge(to, amount);
+		String txhash = chargeService.recharge(sender,to, amount);
 		log.info(txhash);
 		assertNotNull(txhash);
 
@@ -64,7 +66,7 @@ public class ChargeServiceTest {
 
 		String ddcAddr = ConfigCache.get().getDdc1155Address();
 
-		String sig = "0xf242432a";
+		String sig = "0xd0def521";
 		
 		BigInteger fee = chargeService.queryFee(ddcAddr, sig);
 		assertNotNull(fee);
@@ -76,9 +78,9 @@ public class ChargeServiceTest {
 	public void selfRecharge() throws Exception {
 		ChargeService chargeService = getChargeService();
 		
-		BigInteger amount = new BigInteger("100000");
+		BigInteger amount = new BigInteger("10000000");
 		
-		String txHash = chargeService.selfRecharge(amount);
+		String txHash = chargeService.selfRecharge(sender,amount);
 		assertNotNull(txHash);
 	}
 	
@@ -88,7 +90,7 @@ public class ChargeServiceTest {
 		ChargeService chargeService = getChargeService();
 
 		String ddcAddr = ConfigCache.get().getDdc721Address();
-		BigInteger amount = new BigInteger("100");
+		BigInteger amount = new BigInteger("10");
 
 		ArrayList<String> sigList = new ArrayList<>();
 		// 721
@@ -112,7 +114,7 @@ public class ChargeServiceTest {
 		sigList.add(burn);
 
 		for (int i = 0; i < sigList.size(); i++) {
-			String txHash = chargeService.setFee(ddcAddr, sigList.get(i), amount);
+			String txHash = chargeService.setFee(sender,ddcAddr, sigList.get(i), amount);
 			assertNotNull(txHash);
 		}
 
@@ -128,8 +130,8 @@ public class ChargeServiceTest {
 		ArrayList<String> sigList = new ArrayList<>();
 
 		// 1155
-		String mint                  = "0xd3fc9864";
-		String mintBatch             = "0x146d9ddc";
+		String safeMint              = "0xb55bc617";
+		String safeMintBatch         = "0x63570355";
 		String setApprovalForAll     = "0xa22cb465";
 		String isApprovedForAll      = "0xe985e9c5";
 		String safeTransferFrom      = "0xf242432a";
@@ -142,8 +144,8 @@ public class ChargeServiceTest {
 		String balanceOfBatch        = "0x4e1273f4";
 		String ddcURI                = "0x293ec97c";
 
-		sigList.add(mint);
-		sigList.add(mintBatch);
+		sigList.add(safeMint);
+		sigList.add(safeMintBatch);
 		sigList.add(setApprovalForAll);
 		sigList.add(isApprovedForAll);
 		sigList.add(safeTransferFrom);
@@ -157,7 +159,7 @@ public class ChargeServiceTest {
 		sigList.add(ddcURI);
 
 		for (int i = 0; i < sigList.size(); i++) {
-			String txHash = chargeService.setFee(ddcAddr, sigList.get(i), amount);
+			String txHash = chargeService.setFee(sender,ddcAddr, sigList.get(i), amount);
 			assertNotNull(txHash);
 		}
 
@@ -171,7 +173,7 @@ public class ChargeServiceTest {
 		String ddcAddr = "0x1f961199f2A8811f0A4bF1bF6C0Fffb97475AF22";
 		String sig = "0x70a08231";
 		
-		String txHash = chargeService.delFee(ddcAddr, sig);
+		String txHash = chargeService.delFee(sender,ddcAddr, sig);
 		assertNotNull(txHash);
 	}
 	
@@ -182,7 +184,7 @@ public class ChargeServiceTest {
 		
 		String ddcAddr = "0x1f961199f2A8811f0A4bF1bF6C0Fffb97475AF23";
 		
-		String txHash = chargeService.delDDC(ddcAddr);
+		String txHash = chargeService.delDDC(sender,ddcAddr);
 		assertNotNull(txHash);
 	}
 	

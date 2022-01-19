@@ -7,6 +7,7 @@ package com.reddate.ddc.constant;
  */
 public class DDC721Functions {
     public static final String MINT = "mint";
+    public static final String SAFE_MINT = "safeMint";
     public static final String APPROVE = "approve";
     public static final String GET_APPROVED = "getApproved";
     public static final String SET_APPROVAL_FOR_ALL = "setApprovalForAll";
