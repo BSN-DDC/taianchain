@@ -506,7 +506,7 @@ public class DDC721Service extends BaseService {
     }
 
     /**
-     * 获取DDCURI
+     * 获取ddcURI
      *
      * @return DDC资源标识符
      * @throws Exception Exception
@@ -527,7 +527,38 @@ public class DDC721Service extends BaseService {
         return inputAndOutputResult.getResult().get(0).getData().toString();
     }
 
+
+    /**
+     * 设置URI DDC拥有者和授权者可调用该方法
+     * @param sender
+     * @param ddcId
+     * @param ddcURI
+     * @return
+     * @throws Exception
+     */
+    public String setURI(String sender, BigInteger ddcId, String ddcURI) throws Exception {
+        if (null == ddcId || ddcId.compareTo(new BigInteger("0")) <= 0) {
+            throw new DDCException(ErrorMessage.DDCID_IS_WRONG);
+        }
+
+        if (Strings.isEmpty(ddcURI)) {
+            throw new DDCException(ErrorMessage.DDCURI_IS_EMPTY);
+        }
+
+        ArrayList<Object> arrayList = new ArrayList<>();
+        arrayList.add(ddcId);
+        arrayList.add(ddcURI);
+
+        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721Transaction(sender,DDC721Functions.SET_URI, arrayList);
+        RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
+        resultCheck(respJsonRpcBean);
+
+        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), respJsonRpcBean.getResult().toString());
+        return inputAndOutputResult.getResult().get(0).getData().toString();
+    }
+
     private ReqJsonRpcBean assembleDDC721Transaction(String sender,String functionName, ArrayList<Object> params) throws Exception {
         return assembleTransaction(sender,getBlockNumber(), ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721Address(), functionName, params);
     }
+
 }

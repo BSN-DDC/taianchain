@@ -1,16 +1,13 @@
 package com.reddate.ddc.service;
 
-import com.alibaba.fastjson.JSON;
 import com.reddate.ddc.DDCSdkClient;
 import lombok.extern.slf4j.Slf4j;
 import org.fisco.bcos.web3j.tx.txdecode.BaseException;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 class BlockEventServiceTest {
@@ -21,9 +18,9 @@ class BlockEventServiceTest {
     BlockEventService blockEventService = new BlockEventService();
 
     @Test
-    void getBlockEvent() throws BaseException, IOException, InterruptedException {
+    void getBlockEvent() throws BaseException, IOException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
         ArrayList<Object> result = new ArrayList<>();
-        for (int i = 588094; i < 588095; i++) {
+        for (int i = 690210; i < 690211; i++) {
             result.addAll(blockEventService.getBlockEvent(String.valueOf(i)));
         }
         log.info("");

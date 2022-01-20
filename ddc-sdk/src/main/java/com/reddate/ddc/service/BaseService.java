@@ -12,7 +12,6 @@ import com.reddate.ddc.util.SignedTransactionsUtils;
 import com.reddate.ddc.util.http.RestTemplateUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.fisco.bcos.web3j.crypto.gm.sm2.util.encoders.Hex;
-import org.fisco.bcos.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.fisco.bcos.web3j.protocol.exceptions.TransactionException;
 import org.fisco.bcos.web3j.tx.txdecode.BaseException;
 import org.fisco.bcos.web3j.tx.txdecode.InputAndOutputResult;

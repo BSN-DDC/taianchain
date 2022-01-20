@@ -1,37 +1,20 @@
 package com.reddate.ddc.service;
 
-import static org.junit.Assert.assertNotNull;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-
 import com.reddate.ddc.config.ConfigCache;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
-import com.reddate.ddc.DDCSdkClient;
-import com.reddate.ddc.listener.Secp256K1SignEventListener;
+import java.math.BigInteger;
+import java.util.ArrayList;
+
+import static org.junit.Assert.assertNotNull;
 
 @Slf4j
-public class ChargeServiceTest {
+public class ChargeServiceTest extends BaseServiceTest{
 
-	String privateKey = "-----BEGIN PRIVATE KEY-----\n" +
-			"MIGEAgEAMBAGByqGSM49AgEGBSuBBAAKBG0wawIBAQQgseEExMPXTcSpExzejzYZ\n" +
-			"wcLWikQtoZ3BRhWergMR2LGhRANCAATCEQFr8dEbUI6ZYChl4+pE3UopdpWknZiv\n" +
-			"rK7WWNymFHQQyIN15nsq5ZZat8G+iPNLtCdRSaU3h769ObArmg11\n" +
-			"-----END PRIVATE KEY-----";
+	String abi = ConfigCache.get().getChargeLogicABI();
+	String bin = ConfigCache.get().getChargeLogicBIN();
 
-	String publicKey = "-----BEGIN PUBLIC KEY-----\n" +
-			"MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEjRHf7EbOKvUwRJW/kn4N6Vmf++n/gBu0\n" +
-			"WEBUzovj+TAxwvgB26tCfoqk9X2gTdjwwKh6o/hvtx66EDB9GlzgTA==\n" +
-			"-----END PUBLIC KEY-----";
-	
-	String sender = "0x81072375a506581cadbd90734bd00a20cddbe48b";
-	static {
-		DDCSdkClient sdk = new DDCSdkClient();
-		sdk.init();
-	}
-	
 	@Test
 	public void recharge() throws Exception {
 		ChargeService chargeService = getChargeService();
@@ -40,9 +23,10 @@ public class ChargeServiceTest {
 		String to = "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63";
 		BigInteger amount = new BigInteger("300000");
 		
-		String txhash = chargeService.recharge(sender,to, amount);
-		log.info(txhash);
-		assertNotNull(txhash);
+		String txHash = chargeService.recharge(consumerAddress,to, amount);
+		log.info(txHash);
+		log.info(analyzeRecepit(txHash,abi,bin));
+		assertNotNull(txHash);
 
 	}
 	
@@ -58,15 +42,15 @@ public class ChargeServiceTest {
 		log.info(amont.toString());
 		assertNotNull(amont);
 	}
-	
+
 	
 	@Test
 	public void queryFee() throws Exception {
 		ChargeService chargeService = getChargeService();
 
-		String ddcAddr = ConfigCache.get().getDdc1155Address();
+		String ddcAddr = ConfigCache.get().getDdc721Address();
 
-		String sig = "0xd0def521";
+		String sig = "0xf6dda936";
 		
 		BigInteger fee = chargeService.queryFee(ddcAddr, sig);
 		assertNotNull(fee);
@@ -80,7 +64,8 @@ public class ChargeServiceTest {
 		
 		BigInteger amount = new BigInteger("10000000");
 		
-		String txHash = chargeService.selfRecharge(sender,amount);
+		String txHash = chargeService.selfRecharge(consumerAddress,amount);
+		log.info(analyzeRecepit(txHash,abi,bin));
 		assertNotNull(txHash);
 	}
 	
@@ -90,7 +75,7 @@ public class ChargeServiceTest {
 		ChargeService chargeService = getChargeService();
 
 		String ddcAddr = ConfigCache.get().getDdc721Address();
-		BigInteger amount = new BigInteger("10");
+		BigInteger amount = new BigInteger("100");
 
 		ArrayList<String> sigList = new ArrayList<>();
 		// 721
@@ -104,18 +89,19 @@ public class ChargeServiceTest {
 		String freeeze = "0xd7a78db8";
 		String unFreeze = "0xd302b0dc";
 
-		sigList.add(mint);
-		sigList.add(freeeze);
-		sigList.add(unFreeze);
-		sigList.add(approve);
-		sigList.add(setApprovalForAll);
+//		sigList.add(mint);
+//		sigList.add(freeeze);
+//		sigList.add(unFreeze);
+//		sigList.add(approve);
+//		sigList.add(setApprovalForAll);
 		sigList.add(safeTransferFrom);
-		sigList.add(transferFrom);
-		sigList.add(burn);
+//		sigList.add(transferFrom);
+//		sigList.add(burn);
 
 		for (int i = 0; i < sigList.size(); i++) {
-			String txHash = chargeService.setFee(sender,ddcAddr, sigList.get(i), amount);
+			String txHash = chargeService.setFee(consumerAddress,ddcAddr, sigList.get(i), amount);
 			assertNotNull(txHash);
+			log.info(analyzeRecepit(txHash,abi,bin));
 		}
 
 	}
@@ -159,7 +145,8 @@ public class ChargeServiceTest {
 		sigList.add(ddcURI);
 
 		for (int i = 0; i < sigList.size(); i++) {
-			String txHash = chargeService.setFee(sender,ddcAddr, sigList.get(i), amount);
+			String txHash = chargeService.setFee(consumerAddress,ddcAddr, sigList.get(i), amount);
+			log.info(analyzeRecepit(txHash,abi,bin));
 			assertNotNull(txHash);
 		}
 
@@ -173,7 +160,8 @@ public class ChargeServiceTest {
 		String ddcAddr = "0x1f961199f2A8811f0A4bF1bF6C0Fffb97475AF22";
 		String sig = "0x70a08231";
 		
-		String txHash = chargeService.delFee(sender,ddcAddr, sig);
+		String txHash = chargeService.delFee(consumerAddress,ddcAddr, sig);
+		log.info(analyzeRecepit(txHash,abi,bin));
 		assertNotNull(txHash);
 	}
 	
@@ -184,17 +172,9 @@ public class ChargeServiceTest {
 		
 		String ddcAddr = "0x1f961199f2A8811f0A4bF1bF6C0Fffb97475AF23";
 		
-		String txHash = chargeService.delDDC(sender,ddcAddr);
+		String txHash = chargeService.delDDC(consumerAddress,ddcAddr);
+		log.info(analyzeRecepit(txHash,abi,bin));
 		assertNotNull(txHash);
 	}
-	
-	private ChargeService getChargeService() {
-		ChargeService chargeService = null;
-		try {
-			chargeService = new ChargeService(new Secp256K1SignEventListener(privateKey, publicKey));
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return chargeService;
-	}
+
 }

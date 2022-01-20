@@ -17,7 +17,7 @@ public class ChargeFunctions {
 
 
 	public static final String RechargeEvent = "Recharge(address,address,uint256)";
-	public static final String PayEvent = "Pay(address,address,bytes4,uint32)";
+	public static final String PayEvent = "Pay(address,address,bytes4,uint32,uint256)";
 	public static final String SetFeeEvent = "SetFee(address,byte4,uint)";
 	public static final String DelFeeEvent = "DelFee(address,bytes4)";
 	public static final String DelDDCEvent = "DelDDC(address)";

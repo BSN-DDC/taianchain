@@ -2,7 +2,10 @@ package com.reddate.ddc.service;
 
 import com.alibaba.fastjson.JSONObject;
 import com.reddate.ddc.config.ConfigCache;
-import com.reddate.ddc.constant.*;
+import com.reddate.ddc.constant.AuthorityFunctions;
+import com.reddate.ddc.constant.ChargeFunctions;
+import com.reddate.ddc.constant.DDC1155Functions;
+import com.reddate.ddc.constant.DDC721Functions;
 import com.reddate.ddc.dto.ddc.*;
 import com.reddate.ddc.dto.taianchain.BlockInfoBean;
 import com.reddate.ddc.dto.taianchain.TransactionInfoBean;
@@ -38,7 +41,7 @@ public class BlockEventService extends BaseService {
         eventBeanMap.put(AuthorityFunctions.AddAccountEvent, AddAccountEventBean.class);
         eventBeanMap.put(AuthorityFunctions.UpdateAccountStateEvent, UpdateAccountStateEventBean.class);
 
-        eventBeanMap.put(ChargeFunctions.RechargeEvent,ReChargeEventBean.class);
+        eventBeanMap.put(ChargeFunctions.RechargeEvent, ReChargeEventBean.class);
         eventBeanMap.put(ChargeFunctions.PayEvent, PayEventBean.class);
         eventBeanMap.put(ChargeFunctions.SetFeeEvent, SetFeeEventBean.class);
         eventBeanMap.put(ChargeFunctions.DelFeeEvent, DeleteFeeEventBean.class);
@@ -65,7 +68,7 @@ public class BlockEventService extends BaseService {
      * @throws BaseException BaseException
      * @throws IOException   IOException
      */
-    public <T extends BaseEventBean> ArrayList<T> getBlockEvent(String blockNumber) throws BaseException, IOException, InterruptedException {
+    public <T extends BaseEventBean> ArrayList<T> getBlockEvent(String blockNumber) throws BaseException, IOException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
         ArrayList<T> arrayList = new ArrayList<>();
         // 1. 获取区块信息
         BlockInfoBean blockInfoBean = getBlockInfo(blockNumber);
@@ -74,10 +77,10 @@ public class BlockEventService extends BaseService {
         for (int i = 0; i < blockInfoBean.getTransactions().size(); i++) {
 
             TransactionInfoBean transaction = blockInfoBean.getTransactions().get(i);
-            ArrayList<T> transactionArrayList = analyzeEventsByTransaction(transaction,blockInfoBean);
+            ArrayList<T> transactionArrayList = analyzeEventsByTransaction(transaction, blockInfoBean);
             arrayList.addAll(transactionArrayList);
         }
-        log.info("块高 {} 解析到区块事件 {}",blockNumber, JSONObject.toJSONString(arrayList));
+        log.info("块高 {} 解析到区块事件 {}", blockNumber, JSONObject.toJSONString(arrayList));
         return arrayList;
     }
 
@@ -89,7 +92,7 @@ public class BlockEventService extends BaseService {
      * @throws BaseException BaseException
      * @throws IOException   IOException
      */
-    private <T extends BaseEventBean> ArrayList<T> analyzeEventsByTransaction(TransactionInfoBean transaction, BlockInfoBean blockInfoBean) throws BaseException, IOException, InterruptedException {
+    private <T extends BaseEventBean> ArrayList<T> analyzeEventsByTransaction(TransactionInfoBean transaction, BlockInfoBean blockInfoBean) throws BaseException, IOException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
         ArrayList<T> arrayList = new ArrayList<>();
         // 获取交易回执
         TransactionRecepitBean transactionRecepitBean = getTransactionRecepit(transaction.getHash());
@@ -124,7 +127,7 @@ public class BlockEventService extends BaseService {
             }
             ArrayList<Log> logs = new ArrayList<>();
             logs.add(log);
-            arrayList.addAll(analyzeEventsByLog(abi,bin,transaction,blockInfoBean,logs));
+            arrayList.addAll(analyzeEventsByLog(abi, bin, transaction, blockInfoBean, logs));
         }
 
         return arrayList;
@@ -132,6 +135,7 @@ public class BlockEventService extends BaseService {
 
     /**
      * 通过Log解析事件
+     *
      * @param abi
      * @param bin
      * @param transaction
@@ -142,7 +146,7 @@ public class BlockEventService extends BaseService {
      * @throws BaseException
      * @throws IOException
      */
-    private <T extends BaseEventBean> ArrayList<T> analyzeEventsByLog(String abi, String bin, TransactionInfoBean transaction, BlockInfoBean blockInfoBean, ArrayList<Log> logs) throws BaseException, IOException {
+    private <T extends BaseEventBean> ArrayList<T> analyzeEventsByLog(String abi, String bin, TransactionInfoBean transaction, BlockInfoBean blockInfoBean, ArrayList<Log> logs) throws BaseException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
         ArrayList<T> arrayList = new ArrayList<>();
         // 解析交易回执中的事件
         Map<String, List<List<EventResultEntity>>> map = AnalyzeChainInfoUtils.analyzeEventLog(abi, bin, JSONObject.toJSONString(logs));
@@ -155,21 +159,13 @@ public class BlockEventService extends BaseService {
 
             List<List<EventResultEntity>> eventLists = map.get(entry.getKey());
             for (List<EventResultEntity> eventList : eventLists) {
-                try {
-                    T eventBean = (T) assembleBeanByReflect(eventList, entry.getValue());
-                    eventBean.setBlockHash(blockInfoBean.getHash());
-                    eventBean.setTransactionInfoBean(transaction);
-                    eventBean.setBlockNumber(blockInfoBean.getNumber());
-                    eventBean.setTimestamp(blockInfoBean.getTimestamp());
-                    arrayList.add(eventBean);
-                } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException | InstantiationException e) {
-                    e.printStackTrace();
-//                    try {
-//                        throw e;
-//                    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException ex) {
-//                        ex.printStackTrace();
-//                    }
-                }
+                T eventBean = (T) assembleBeanByReflect(eventList, entry.getValue());
+                eventBean.setBlockHash(blockInfoBean.getHash());
+                eventBean.setTransactionInfoBean(transaction);
+                eventBean.setBlockNumber(blockInfoBean.getNumber());
+                eventBean.setTimestamp(blockInfoBean.getTimestamp());
+                arrayList.add(eventBean);
+
             }
         }
         return arrayList;

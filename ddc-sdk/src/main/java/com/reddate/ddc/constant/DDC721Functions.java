@@ -22,6 +22,7 @@ public class DDC721Functions {
     public static final String NAME = "name";
     public static final String SYMBOL = "symbol";
     public static final String DDC_URI = "ddcURI";
+    public static final String SET_URI = "setURI";
 
     public static final String DDC721TransferEvent = "Transfer(address,address,uint256)";
     public static final String DDC721FreezeEvent = "EnterBlacklist(address,uint256)";
