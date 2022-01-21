@@ -22,7 +22,7 @@ class DDC1155ServiceTest extends BaseServiceTest {
 
     @Test
     void mint() throws Exception {
-        String tx = getDDC1155Service().mint(consumerAddress, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", new BigInteger("100"), "Token1", "test additional data".getBytes());
+        String tx = getDDC1155Service().safeMint(consumerAddress, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", new BigInteger("100"), "Token1", "test additional data".getBytes());
         log.info(tx);
         assertNotNull(tx);
         log.info(analyzeRecepit(tx, abi, bin));
@@ -33,7 +33,7 @@ class DDC1155ServiceTest extends BaseServiceTest {
         Multimap<BigInteger, String> map = ArrayListMultimap.create();
         map.put(new BigInteger("1"), "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63");
         map.put(new BigInteger("1"), "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e2");
-        String tx = getDDC1155Service().mintBatch(consumerAddress, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", map, "test additional data".getBytes());
+        String tx = getDDC1155Service().safeMintBatch(consumerAddress, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", map, "test additional data".getBytes());
         log.info(tx);
         assertNotNull(tx);
         log.info(analyzeRecepit(tx, abi, bin));

@@ -37,7 +37,7 @@ public class DDC1155Service extends BaseService {
      * @return 交易哈希
      * @throws Exception Exception
      */
-    public String mint(String sender, String to, BigInteger amount, String ddcURI, byte[] data) throws Exception {
+    public String safeMint(String sender, String to, BigInteger amount, String ddcURI, byte[] data) throws Exception {
         if (Strings.isEmpty(sender)) {
             throw new DDCException(ErrorMessage.SENDER_IS_EMPTY);
         }
@@ -66,7 +66,7 @@ public class DDC1155Service extends BaseService {
         //arrayList.add(new String(data));
         arrayList.add(data);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleDDC1155Transaction(sender, DDC1155Functions.Mint, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleDDC1155Transaction(sender, DDC1155Functions.SAFE_MINT, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
         return (String) respJsonRpcBean.getResult();
@@ -82,7 +82,7 @@ public class DDC1155Service extends BaseService {
      * @return 交易哈希
      * @throws Exception Exception
      */
-    public String mintBatch(String sender, String to, Multimap<BigInteger, String> ddcInfo, byte[] data) throws Exception {
+    public String safeMintBatch(String sender, String to, Multimap<BigInteger, String> ddcInfo, byte[] data) throws Exception {
         if (Strings.isEmpty(sender)) {
             throw new DDCException(ErrorMessage.SENDER_IS_EMPTY);
         }
@@ -119,7 +119,7 @@ public class DDC1155Service extends BaseService {
         //arrayList.add(new String(data));
         arrayList.add(data);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleDDC1155Transaction(sender, DDC1155Functions.MintBatch, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleDDC1155Transaction(sender, DDC1155Functions.SAFE_MINT_BATCH, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
         return (String) respJsonRpcBean.getResult();

@@ -1,8 +1,8 @@
 package com.reddate.ddc.constant;
 
 public class DDC1155Functions {
-    public static final String Mint = "safeMint";
-    public static final String MintBatch = "safeMintBatch";
+    public static final String SAFE_MINT = "safeMint";
+    public static final String SAFE_MINT_BATCH = "safeMintBatch";
     public static final String SetApprovalForAll = "setApprovalForAll";
     public static final String IsApprovedForAll = "isApprovedForAll";
     public static final String SafeTransferFrom = "safeTransferFrom";
