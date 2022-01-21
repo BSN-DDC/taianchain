@@ -64,14 +64,33 @@ contract:
 
 3. 调用合约方法进行DDC的发行、流转
 ```
-    // 通过合约的实例进行该合约内方法的调用，此处以发行、流转一个DDC721为例
+    //通过合约的实例进行该合约内方法的调用，此处以发行、查看ddcId、流转一个DDC721为例
+    //发行DDC
     void mint() throws Exception {
         String tx = getDDC721Service().mint(address, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63");
         log.info(tx);
     }
     
+    //查看721 DDCID 信息
+    void getDDCInfoByBlockNumber() throws BaseException, InterruptedException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+        BlockEventService blockEventService = new BlockEventService();
+        String blockNumber = "760261";
+        ArrayList result = new ArrayList();
+        result.addAll(blockEventService.getBlockEvent(blockNumber));
+
+        result.forEach( t -> {
+            if (t instanceof DDC721TransferEventBean) {
+                log.info("{}:DDCID {}",t.getClass(),((DDC721TransferEventBean) t).getDdcId());
+            }
+        });
+    }
+    
+    //流转DDC
      void transferFrom() throws Exception {
         String tx = getDDC721Service().transferFrom(address, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0x5c5101afe03b416b9735f40ddc3ba7b0c354a5a0", new BigInteger("1"));
         log.info(tx);
     }
+    
+   
+    
 ```

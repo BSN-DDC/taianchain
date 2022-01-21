@@ -230,7 +230,7 @@ public class AuthorityService extends BaseService {
         ArrayList<Object> arrayList = new ArrayList<>();
         arrayList.add(new Address(from));
         arrayList.add(new Address(to));
-        arrayList.add(new Bool(approved));
+        arrayList.add(approved);
 
         ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(sender,AuthorityFunctions.CrossPlatformApproval, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);

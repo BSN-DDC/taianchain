@@ -1,10 +1,16 @@
 package com.reddate.ddc.service;
 
 import com.reddate.ddc.config.ConfigCache;
+import com.reddate.ddc.dto.ddc.DDC721TransferEventBean;
 import lombok.extern.slf4j.Slf4j;
+import org.fisco.bcos.web3j.protocol.exceptions.TransactionException;
+import org.fisco.bcos.web3j.tx.txdecode.BaseException;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertNotNull;
 
@@ -31,6 +37,20 @@ class DDC721ServiceTest extends BaseServiceTest{
             assertNotNull(tx);
         }
 
+    }
+
+    @Test
+    void getDDCInfoByBlockNumber() throws BaseException, InterruptedException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+        BlockEventService blockEventService = new BlockEventService();
+        String blockNumber = "760261";
+        ArrayList result = new ArrayList();
+        result.addAll(blockEventService.getBlockEvent(blockNumber));
+
+        result.forEach( t -> {
+            if (t instanceof DDC721TransferEventBean) {
+                log.info("{}:DDCID {}",t.getClass(),((DDC721TransferEventBean) t).getDdcId());
+            }
+        });
     }
 
     @Test
