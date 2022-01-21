@@ -1,28 +1,15 @@
 package com.reddate.ddc;
 
 
-import com.reddate.ddc.config.ConfigCache;
-import com.reddate.ddc.config.ConfigInfo;
 import com.reddate.ddc.listener.SignEventListener;
 import com.reddate.ddc.service.AuthorityService;
 import com.reddate.ddc.service.ChargeService;
 import com.reddate.ddc.service.DDC1155Service;
 import com.reddate.ddc.service.DDC721Service;
-import com.reddate.ddc.util.ConfigUtils;
 
 public class DDCSdkClient {
 
 	private SignEventListener signEventListener;
-	
-	/**
-	 * SDK 初始化方法，在此方法中解析SDK的配置文件，并且放到程序缓存中。
-	 * 
-	 * 
-	 */
-	public void init(){
-		ConfigInfo configInfo = ConfigUtils.loadConfigFromFile();
-		ConfigCache.initCache(configInfo);
-	}
 	
 	/**
 	 * SDK注册全局的签名事件，所有发起的交易将通过此事件进行签名处理

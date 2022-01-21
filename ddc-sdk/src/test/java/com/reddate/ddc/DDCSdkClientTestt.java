@@ -10,7 +10,6 @@ public class DDCSdkClientTestt {
 	 @Test
 	public void sdkInitTest() throws Exception {
 		 DDCSdkClient sdk = new DDCSdkClient();
-		 sdk.init();
 		 String privateKey = "";
 		 String publicKey = "";
 		 SignEventListener signEventListener =  new Secp256K1SignEventListener(privateKey, publicKey);

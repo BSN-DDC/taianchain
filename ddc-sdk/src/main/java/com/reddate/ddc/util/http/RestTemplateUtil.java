@@ -1,20 +1,16 @@
 package com.reddate.ddc.util.http;
 
 import com.alibaba.fastjson.JSONObject;
-import com.reddate.ddc.constant.FiscoFunctions;
+import com.reddate.ddc.config.ConfigCache;
 import lombok.extern.slf4j.Slf4j;
 import org.fisco.bcos.web3j.utils.Strings;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
-import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
 import java.util.Map;
 
 @Slf4j
@@ -33,11 +29,10 @@ public class RestTemplateUtil {
         header.set("charset", "UTF-8");
         header.set("Content-Type", "application/json");
 
-        if (!Strings.isEmpty(FiscoFunctions.xApiKey)) {
-            header.set("x-api-key",FiscoFunctions.xApiKey);
+        if (!Strings.isEmpty(ConfigCache.get().getApiKey())) {
+            header.set("x-api-key",ConfigCache.get().getApiKey());
         }
 
-//        header.setContentType(MediaType.APPLICATION_JSON);
         String value = JSONObject.toJSONString(params);
 
         log.debug("send http request to {} ,the params are {}", url, value);

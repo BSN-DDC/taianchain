@@ -9,6 +9,9 @@ public class ConfigInfo {
 
 	private String opbGatewayAddress = "http://192.168.1.57:8545";
 
+	//开放联盟链网关启用x-api-key后需设置将该值
+	private String apiKey = "";
+
 	private String ddc721ABI;
 
 	private String ddc721BIN;
@@ -35,7 +38,7 @@ public class ConfigInfo {
 
 	private Long queryRecepitWaitTime = 300L;
 
-	private Integer queryRecepitRetryCount = 10;
+	private Integer queryRecepitRetryCount = 20;
 
 	public Integer getConTimeout() {
 		return conTimeout;
@@ -59,6 +62,14 @@ public class ConfigInfo {
 
 	public void setOpbGatewayAddress(String opbGatewayAddress) {
 		this.opbGatewayAddress = opbGatewayAddress;
+	}
+
+	public String getApiKey() {
+		return apiKey;
+	}
+
+	public void setApiKey(String apiKey) {
+		this.apiKey = apiKey;
 	}
 
 	public String getDdc721ABI() {

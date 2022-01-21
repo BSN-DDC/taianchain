@@ -12,7 +12,4 @@ public class FiscoFunctions {
     public static final String GetTransactionReceipt = "getTransactionReceipt";
     public static final String SendRawTransaction = "sendRawTransaction";
 
-    //开放联盟链网关启用x-api-key后需设置将该值
-    public static String xApiKey = "";
-
 }

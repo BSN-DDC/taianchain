@@ -10,10 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 @Slf4j
-class BlockEventServiceTest {
-    static {
-        new DDCSdkClient().init();
-    }
+class BlockEventServiceTest extends BaseServiceTest{
 
     BlockEventService blockEventService = new BlockEventService();
 
