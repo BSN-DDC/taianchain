@@ -47,6 +47,17 @@ public class AuthorityServiceTest extends BaseServiceTest{
     }
 
     @Test
+    void crossPlatformApproval() throws Exception {
+        AuthorityService authorityService = getAuthorityService();
+        String from = "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e64";
+        String to = "0x10031Aa7725A6828BcCE4F0b90cFE451C31c1e61";
+
+        String txHash = authorityService.crossPlatformApproval(consumerAddress,from, to, true);
+        assertNotNull(txHash);
+        log.info(analyzeRecepit(txHash,abi,bin));
+    }
+
+    @Test
     public void getAccount() throws Exception {
         AuthorityService authorityService = getAuthorityService();
 

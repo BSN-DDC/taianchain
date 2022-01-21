@@ -12,17 +12,16 @@ import com.reddate.ddc.exception.DDCException;
 import com.reddate.ddc.listener.SignEventListener;
 import com.reddate.ddc.util.AddressUtils;
 import com.reddate.ddc.util.HexUtils;
+
 import lombok.extern.slf4j.Slf4j;
-import org.fisco.bcos.web3j.abi.datatypes.Address;
-import org.fisco.bcos.web3j.abi.datatypes.Utf8String;
+import org.fisco.bcos.web3j.abi.datatypes.*;
 import org.fisco.bcos.web3j.abi.datatypes.generated.Bytes4;
 import org.fisco.bcos.web3j.crypto.gm.sm2.util.encoders.Hex;
 import org.fisco.bcos.web3j.tx.txdecode.InputAndOutputResult;
 import org.fisco.bcos.web3j.tx.txdecode.ResultEntity;
 import org.fisco.bcos.web3j.utils.Strings;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 public class AuthorityService extends BaseService {
@@ -76,7 +75,7 @@ public class AuthorityService extends BaseService {
 
 
     /**
-     * 
+     *
      *   运营方可以通过调用该方法直接对平台方或平台方的终端用户进行创建。
      *
      * @param sender 调用者地址
@@ -95,7 +94,7 @@ public class AuthorityService extends BaseService {
         if (!AddressUtils.isValidAddress(sender)) {
             throw new DDCException(ErrorMessage.SENDER_IS_NOT_ADDRESS_FORMAT);
         }
-        
+
         if (Strings.isEmpty(account)) {
             throw new DDCException(ErrorMessage.ACCOUNT_IS_EMPTY);
         }
@@ -142,7 +141,7 @@ public class AuthorityService extends BaseService {
         if (!AddressUtils.isValidAddress(sender)) {
             throw new DDCException(ErrorMessage.SENDER_IS_NOT_ADDRESS_FORMAT);
         }
-    	
+
         if (Strings.isEmpty(account)) {
             throw new DDCException(ErrorMessage.ACCOUNT_IS_EMPTY);
         }
@@ -203,6 +202,43 @@ public class AuthorityService extends BaseService {
     }
 
     /**
+     * 跨平台授权链账户转移DDC
+     * @param sender
+     * @param from
+     * @param to
+     * @param approved
+     * @return
+     * @throws Exception
+     */
+    public String crossPlatformApproval(String sender,String from,String to,boolean approved) throws Exception {
+        if (Strings.isEmpty(sender)) {
+            throw new DDCException(ErrorMessage.SENDER_IS_EMPTY);
+        }
+
+        if (!AddressUtils.isValidAddress(sender)) {
+            throw new DDCException(ErrorMessage.SENDER_IS_NOT_ADDRESS_FORMAT);
+        }
+
+        if (Strings.isEmpty(from) || Strings.isEmpty(to)) {
+            throw new DDCException(ErrorMessage.ACCOUNT_IS_EMPTY);
+        }
+
+        if (!AddressUtils.isValidAddress(from) || !AddressUtils.isValidAddress(to)) {
+            throw new DDCException(ErrorMessage.ACCOUNT_IS_NOT_ADDRESS_FORMAT);
+        }
+
+        ArrayList<Object> arrayList = new ArrayList<>();
+        arrayList.add(new Address(from));
+        arrayList.add(new Address(to));
+        arrayList.add(new Bool(approved));
+
+        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(sender,AuthorityFunctions.CrossPlatformApproval, arrayList);
+        RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
+        resultCheck(respJsonRpcBean);
+        return (String) respJsonRpcBean.getResult();
+    }
+
+    /**
      * 运营方或平台方通过该方法进行DDC账户信息状态的更改。
      *
      * @param sender 调用者地址
@@ -219,7 +255,7 @@ public class AuthorityService extends BaseService {
         if (!AddressUtils.isValidAddress(sender)) {
             throw new DDCException(ErrorMessage.SENDER_IS_NOT_ADDRESS_FORMAT);
         }
-    	
+
         if (Strings.isEmpty(account)) {
             throw new DDCException(ErrorMessage.ACCOUNT_IS_EMPTY);
         }
@@ -308,7 +344,7 @@ public class AuthorityService extends BaseService {
         if (!AddressUtils.isValidAddress(sender)) {
             throw new DDCException(ErrorMessage.SENDER_IS_NOT_ADDRESS_FORMAT);
         }
-    	
+
         if (Strings.isEmpty(ddcAddr)) {
             throw new DDCException(ErrorMessage.DDC_ADDR_IS_EMPTY);
         }
@@ -359,7 +395,7 @@ public class AuthorityService extends BaseService {
         if (!AddressUtils.isValidAddress(sender)) {
             throw new DDCException(ErrorMessage.SENDER_IS_NOT_ADDRESS_FORMAT);
         }
-    	
+
         if (Strings.isEmpty(ddcAddr)) {
             throw new DDCException(ErrorMessage.DDC_ADDR_IS_EMPTY);
         }

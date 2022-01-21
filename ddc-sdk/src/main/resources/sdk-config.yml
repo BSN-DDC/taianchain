@@ -11,11 +11,3 @@ contract:
   queryRecepitWaitTime: 200
   ## 查询交易回执重试次数
   queryRecepitRetryCount: 20
-  ## DDC721合约地址
-  ddc721Addr: "0x5a7ac17A046003E3048aB749E60EB71988393104"
-  ## DDC1155合约地址
-  ddc1155Addr:  "0x727CdAD1C0324E8f236fa5A22F7f13174FF5F9C3"
-  ## 权限逻辑合约地址
-  authorityLogicAddr: "0x3a4E0796e910FCBD55193C1046D6e8Ee0FA97fCF"
-  ## 计费逻辑合约地址
-  chargeLogicAddr: "0xD2b9EF79d3fC992C767fb2E7Fb5E337DF27848D6"

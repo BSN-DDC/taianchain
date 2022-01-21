@@ -1,21 +1,15 @@
 package com.reddate.ddc.util;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-
-import org.springframework.util.ResourceUtils;
-import org.yaml.snakeyaml.Yaml;
-
+import com.reddate.ddc.config.ConfigCache;
 import com.reddate.ddc.config.ConfigInfo;
 import com.reddate.ddc.constant.ErrorMessage;
 import com.reddate.ddc.exception.DDCException;
-import com.reddate.ddc.service.BaseService;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.ResourceUtils;
+import org.yaml.snakeyaml.Yaml;
+
+import java.io.*;
+import java.util.Map;
 
 @Slf4j
 public class ConfigUtils {
@@ -30,41 +24,12 @@ public class ConfigUtils {
 	
 	public static final String CONTRACT = "contract";
 	
-	public static final String DDC_721_CONTRACT_ADDR = "ddc721Addr";
-	
-	public static final String DDC_1155_CONRACT_ADDR = "ddc1155Addr";
-	
-	public static final String AUTHORITY_LOGIC_ADDR = "authorityLogicAddr";
-	
-	public static final String CHARGE_LOGIC_ADDR = "chargeLogicAddr";
-	
-	public static final String DDC721_ABI_FILE = "contract/DDC721.abi";
-	
-	public static final String DDC721_BIN_FILE = "contract/DDC721.bin";
-	
-	public static final String DDC1155_ABI_FILE = "contract/DDC1155.abi";
-	
-	public static final String DDC1155_BIN_FILE = "contract/DDC1155.bin";
-	
-	public static final String AUTHORITY_ABI_FILE = "contract/AuthorityLogic.abi";
-	
-	public static final String AUTHORITY_BIN_FILE = "contract/AuthorityLogic.bin";
-	
-	public static final String CHARGE_ABI_FILE = "contract/ChargeLogic.abi";
-	
-	public static final String CHARGE_BIN_FILE = "contract/AuthorityLogic.bin";
-	
-	public static final String PRIVATE_KEY_FILE = "cert/privateKey.pem";
-	
-	public static final String PUBLIC_KEY_FILE = "cert/publicKey.pem";
-	
 	public static final String CONFIG_YAML_FILE = "sdk-config.yml";
 	
 	public static final String QUERY_RECEPIT_WAINT_TIME = "queryRecepitWaitTime";
 	
 	public static final String QUERY_RECEPIT_RETRY_COUNT = "queryRecepitRetryCount";
-	
-	
+
 	/**
 	 * 解析默认位置的位置文件，并验证配置项，组装成配置对象
 	 * 
@@ -87,10 +52,7 @@ public class ConfigUtils {
 		String opbGatewayAddress = (String)restTemplateMap.get(OPB_GATE_WAY_ADDRESS);
 		
 		Map<String, Object> contractMap = (Map<String, Object>)configMap.get(CONTRACT);
-		String ddc721Address = (String)contractMap.get(DDC_721_CONTRACT_ADDR);
-		String ddc1155Address = (String)contractMap.get(DDC_1155_CONRACT_ADDR);
-		String authorityLogicAddress = (String)contractMap.get(AUTHORITY_LOGIC_ADDR);
-		String chargeLogicAddress = (String)contractMap.get(CHARGE_LOGIC_ADDR);
+
 		Integer queryRecepitWaitTime = (Integer)contractMap.get(QUERY_RECEPIT_WAINT_TIME);
 		Integer queryRecepitRetryCount = (Integer)contractMap.get(QUERY_RECEPIT_RETRY_COUNT);
 		
@@ -119,100 +81,46 @@ public class ConfigUtils {
 			configInfo.setQueryRecepitRetryCount(queryRecepitRetryCount);
 		}
 		
-		if(isEmpty(ddc721Address)) {
+		if(isEmpty(ConfigCache.DDC_721_ADDRESS)) {
 			throw new DDCException(ErrorMessage.DDC_721_ADDRESS_EMPTY);
 		}
-		configInfo.setDdc721Address(ddc721Address);
+		configInfo.setDdc721Address(ConfigCache.DDC_721_ADDRESS);
 		
-		if(isEmpty(ddc1155Address)) {
+		if(isEmpty(ConfigCache.DDC_1155_ADDRESS)) {
 			throw new DDCException(ErrorMessage.DDC_1155_ADDRESS_EMPTY);
 		}
-		configInfo.setDdc1155Address(ddc1155Address);
+		configInfo.setDdc1155Address(ConfigCache.DDC_1155_ADDRESS);
 		
-		if(isEmpty(authorityLogicAddress)) {
+		if(isEmpty(ConfigCache.AUTHORITY_ADDRESS)) {
 			throw new DDCException(ErrorMessage.DDC_AUTHORITY_ADDRESS_EMPTY);
 		}
-		configInfo.setAuthorityLogicAddress(authorityLogicAddress);
+		configInfo.setAuthorityLogicAddress(ConfigCache.AUTHORITY_ADDRESS);
 		
-		if(isEmpty(chargeLogicAddress)) {
+		if(isEmpty(ConfigCache.CHARGE_ADDRESS)) {
 			throw new DDCException(ErrorMessage.DDC_CHARGE_ADDRESS_EMPTY);
 		}
-		configInfo.setChargeLogicAddress(chargeLogicAddress);
+		configInfo.setChargeLogicAddress(ConfigCache.CHARGE_ADDRESS);
 		
-//		if(isEmpty(signMethod)) {
-//			throw new DDCException(ErrorMessage.SIGN_METHOD_EMPTY);
-//		}
-//		configInfo.setSignMethod(signMethod);
+		configInfo.setDdc721ABI(ConfigCache.DDC_721_ABI);
 		
-		String ddc721abi = readFileContent(DDC721_ABI_FILE);
-		configInfo.setDdc721ABI(ddc721abi);
+		configInfo.setDdc721BIN(ConfigCache.DDC_721_BIN);
 		
-		String ddc721bin = readFileContent(DDC721_BIN_FILE);
-		configInfo.setDdc721BIN(ddc721bin);
+		configInfo.setDdc1155ABI(ConfigCache.DDC_1155_ABI);
 		
-		String ddc1155abi = readFileContent(DDC1155_ABI_FILE);
-		configInfo.setDdc1155ABI(ddc1155abi);
+		configInfo.setDdc1155BIN(ConfigCache.DDC_1155_BIN);
 		
-		String ddc1155bin = readFileContent(DDC1155_BIN_FILE);
-		configInfo.setDdc1155BIN(ddc1155bin);
+		configInfo.setAuthorityLogicABI(ConfigCache.AUTHORITY_ABI);
+		configInfo.setAuthorityLogicBIN(ConfigCache.AUTHORITY_BIN);
 		
-		String authorityLogicABI =readFileContent(AUTHORITY_ABI_FILE);
-		configInfo.setAuthorityLogicABI(authorityLogicABI);
-		
-		String authorityLogicBIN = readFileContent(AUTHORITY_BIN_FILE);
-		configInfo.setAuthorityLogicBIN(authorityLogicBIN);
-		
-		String chargeLogicABI = readFileContent(CHARGE_ABI_FILE);
-		configInfo.setChargeLogicABI(chargeLogicABI);
-		
-		String chargeLogicBIN = readFileContent(CHARGE_BIN_FILE);
-		configInfo.setChargeLogicBIN(chargeLogicBIN);
-		
-//		if(configInfo.isSignMethodPrivateKey()) {
-//			String privateKey = null;
-//			try {
-//				privateKey = readFileContent(PRIVATE_KEY_FILE);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//			configInfo.setPrivateKey(privateKey);
-//			
-//			String publicKey = null;
-//			try {
-//				publicKey = readFileContent(PUBLIC_KEY_FILE);
-//			} catch (Exception e) {
-//				e.printStackTrace();
-//			}
-//			configInfo.setPublicKey(publicKey);
-//		}
-		
+		configInfo.setChargeLogicABI(ConfigCache.CHARGE_ABI);
+		configInfo.setChargeLogicBIN(ConfigCache.CHARGE_BIN);
+
 		return configInfo;
 	}
 	
 	
 	private static boolean isEmpty(String str) {
 		return (str == null || str.trim().isEmpty());
-	}
-	
-	
-	public static String readFileContent(String fileName) {
-		InputStream inputStream = getInputStream(fileName);
-		byte[] bytes = new byte[1024*1024];
-		try {
-			int count = inputStream.read(bytes);
-			return new String(bytes,0,count);
-		} catch (IOException e1) {
-			e1.printStackTrace();
-			throw new DDCException(ErrorMessage.FILE_NOT_EXISTS);
-		} finally {
-			if (inputStream != null) {
-				try {
-					inputStream.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} 
-			} 
-		}
 	}
 	
 	public static InputStream getInputStream(String fileName) {
