@@ -18,4 +18,7 @@ public class PayEventBean extends BaseEventBean {
     
     /** 业务费 */
     BigInteger amount;
+
+    /** ddcId */
+    BigInteger ddcId;
 }
