@@ -3,7 +3,7 @@ package com.reddate.ddc.config;
 public class ConfigCache {
 
     // 网关地址
-    private static final String gatewayUrl = "https://opbtest.bsngate.com:18602/api/2ad7f9e442e2401e8e885b30277724c3/rpc";
+    private static final String gatewayUrl = "https://opbtest.bsngate.com:18602/api/Fiscorpc/rpc";
 
     // HTTP超时时间
     private static final Integer conTimeout = 60;

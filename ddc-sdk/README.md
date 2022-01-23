@@ -5,27 +5,8 @@
 **Java 1.8 或 更高**
 
 
-### 配置文件
-请参考：src/main/resource/sdk-config.yml
-
-```yaml
-restTemplate:
-  ## HTTP超时时间
-  conTimeout: 60
-  readTimeout: 60
-  ## 网关地址
-  opbGatewayAddress: https://opbtest.bsngate.com:18602/api/2ad7f9e442e2401e8e885b30277724c3/rpc
-
-contract:
-  ## DDC721合约地址
-  ddc721Addr: "0xbf615Db72C3eF57724d3b3483da65cDAD938744f"
-  ## DDC1155合约地址
-  ddc1155Addr:  "0x38a0F1D843F68E782F1B8d879a51d078371b8a9b"
-  ## 权限逻辑合约地址
-  authorityLogicAddr: "0x95eB7D1169A314E49B34B0A67fE5d6a939F7C8F4"
-  ## 计费逻辑合约地址
-  chargeLogicAddr: "0xdBAD63EbBA20696e6EC3413e5D7315DcaDE463Ca"
-```
+### 配置说明
+配置信息硬编码到com.reddate.ddc.config.ConfigCache文件中，如需更换相关配置请修改该文件下的信息
 
 ### 调用示例
 
