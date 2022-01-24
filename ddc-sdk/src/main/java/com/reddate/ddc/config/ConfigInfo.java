@@ -7,7 +7,7 @@ public class ConfigInfo {
 
 	private Integer readTimeout = 60;
 
-	private String opbGatewayAddress = "http://192.168.1.57:8545";
+	private String opbGatewayAddress = "";
 
 	//开放联盟链网关启用x-api-key后需设置将该值
 	private String apiKey = "";

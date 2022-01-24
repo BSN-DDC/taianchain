@@ -1,6 +1,7 @@
 package com.reddate.ddc;
 
 
+import com.reddate.ddc.config.ConfigCache;
 import com.reddate.ddc.listener.SignEventListener;
 import com.reddate.ddc.service.AuthorityService;
 import com.reddate.ddc.service.ChargeService;
@@ -8,6 +9,12 @@ import com.reddate.ddc.service.DDC1155Service;
 import com.reddate.ddc.service.DDC721Service;
 
 public class DDCSdkClient {
+
+	// 请求网关地址
+	public DDCSdkClient(String gatewayUrl) {
+		ConfigCache.setGatewayUrl(gatewayUrl);
+	}
+
 
 	private SignEventListener signEventListener;
 	
