@@ -37,7 +37,7 @@ class BaseServiceTest {
     static DDCSdkClient ddcSdkClient;
     static {
 
-        ddcSdkClient = new DDCSdkClient("");
+        ddcSdkClient = new DDCSdkClient("https://opbtest.bsngate.com:18602/api/projectId/rpc");
 
         Secp256K1SignEventListener signEventListener = null;
         try {

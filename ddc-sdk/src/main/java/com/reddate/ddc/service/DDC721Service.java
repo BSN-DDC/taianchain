@@ -171,7 +171,7 @@ public class DDC721Service extends BaseService {
     }
 
     /**
-     * 授权DDC
+     * 账户授权
      * 
      * @param sender 调用者地址
      * @param operator 授权者账户
@@ -209,7 +209,7 @@ public class DDC721Service extends BaseService {
 
 
     /**
-     * DDC授权查询
+     * 账户授权查询
      *
      * @param owner 拥有者账户
      * @param operator 授权者账户
@@ -472,7 +472,7 @@ public class DDC721Service extends BaseService {
     }
 
     /**
-     * DDC运营方名称
+     * DDC名称
      *
      * @return DDC运营方名称
      * @throws Exception Exception
@@ -489,7 +489,7 @@ public class DDC721Service extends BaseService {
     }
 
     /**
-     * 获取DDC运营方符号
+     * 获取DDC符号
      *
      * @return DDC运营方符号
      * @throws Exception Exception

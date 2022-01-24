@@ -25,7 +25,7 @@
 2. 初始化SDK实例
 ```
     // 初始化SDK配置信息
-    static DDCSdkClient sdk = new DDCSdkClient();
+    static DDCSdkClient sdk = new DDCSdkClient("https://opbtest.bsngate.com:18602/api/projectId/rpc");
     static {
         sdk.init();
         try {
