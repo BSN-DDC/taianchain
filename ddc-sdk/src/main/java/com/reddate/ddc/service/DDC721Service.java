@@ -474,7 +474,7 @@ public class DDC721Service extends BaseService {
     /**
      * DDC名称
      *
-     * @return DDC运营方名称
+     * @return DDC名称
      * @throws Exception Exception
      */
     public String name() throws Exception {
