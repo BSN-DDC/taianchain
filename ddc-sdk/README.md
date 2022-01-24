@@ -46,24 +46,27 @@
 3. 调用合约方法进行DDC的发行、流转
 ```
     //通过合约的实例进行该合约内方法的调用，此处以发行、查看ddcId、流转一个DDC721为例
-    //发行DDC
+    //发行、查看DDC
     void mint() throws Exception {
-        String tx = getDDC721Service().mint(address, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63");
+        String tx = getDDC721Service().mint(consumerAddress, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63");
         log.info(tx);
-    }
-    
-    //查看721 DDCID 信息
-    void getDDCInfoByBlockNumber() throws BaseException, InterruptedException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
-        BlockEventService blockEventService = new BlockEventService();
-        String blockNumber = "760261";
-        ArrayList result = new ArrayList();
-        result.addAll(blockEventService.getBlockEvent(blockNumber));
-
-        result.forEach( t -> {
-            if (t instanceof DDC721TransferEventBean) {
-                log.info("{}:DDCID {}",t.getClass(),((DDC721TransferEventBean) t).getDdcId());
+        assertNotNull(tx);
+        while (true) {
+            TransactionRecepitBean transactionRecepitBean = getDDC721Service().getTransactionRecepit(tx);
+            if (transactionRecepitBean == null) {
+                Thread.sleep(200 * 2);
+                continue;
             }
-        });
+            BlockEventService blockEventService = new BlockEventService();
+            ArrayList result = blockEventService.getBlockEvent(transactionRecepitBean.getBlockNumber());
+            result.forEach(t -> {
+                if (t instanceof DDC721TransferEventBean) {
+                    log.info("{}:DDCID {}", t.getClass(), ((DDC721TransferEventBean) t).getDdcId());
+                }
+            });
+            break;
+        }
+
     }
     
     //流转DDC
