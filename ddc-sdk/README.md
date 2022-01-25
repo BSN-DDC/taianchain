@@ -25,15 +25,17 @@
 2. 初始化SDK实例
 ```
     // 初始化SDK配置信息
-    static DDCSdkClient sdk = new DDCSdkClient("https://opbtest.bsngate.com:18602/api/projectId/rpc");
+    static DDCSdkClient ddcSdkClient;
     static {
-        sdk.init();
+        ddcSdkClient = new DDCSdkClient("https://opbtest.bsngate.com:18602/api/projectId/rpc");
+        Secp256K1SignEventListener signEventListener = null;
         try {
-            //初始化签名方式，此处以本地签名为例
-            sdk.registerSignListener(new Secp256K1SignEventListener(ecPrivateKeyPem, ecPublicKeyPem));
+            // 设置签名使用的公私钥
+            signEventListener = new Secp256K1SignEventListener(ecPrivateKeyPem, ecPublicKeyPem);
         } catch (Exception e) {
             e.printStackTrace();
         }
+        ddcSdkClient.registerSignListener(signEventListener);
     }
     
     // 每个合约的实例通过sdk获取，此处以获取721实例为例
