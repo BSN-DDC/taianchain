@@ -198,7 +198,7 @@ interface IDDC721 is IERC165Upgradeable {
     ) external;
 
     /**
-     * @dev  Freezes a ddc. If the ddc has freezed, it cann't do any actions.
+     * @dev  Freezes a ddc. If the ddc has freezed, it cannot do any transactions.
      *
      * Requirements:
      * - sender's role is operator only.
@@ -207,7 +207,7 @@ interface IDDC721 is IERC165Upgradeable {
     function freeze(uint256 ddcId) external;
 
     /**
-     * @dev  Unfreezes a ddc. If the ddc has unfreezed, it can do any actions.
+     * @dev  Unfreezes a ddc. If the ddc has unfreezed, it can do transactions normally.
      *
      * Requirements:
      * - sender's role is operator only.
