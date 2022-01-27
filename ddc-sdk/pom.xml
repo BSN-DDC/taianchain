@@ -54,10 +54,11 @@
 			<version>1.2.70</version>
 		</dependency>
 
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>28.2-jre</version>
+			<artifactId>guava</artifactId>·
+			<version>30.0-android</version>
 		</dependency>
 
 		<dependency>
