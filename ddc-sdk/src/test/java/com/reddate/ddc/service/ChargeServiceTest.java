@@ -2,12 +2,13 @@ package com.reddate.ddc.service;
 
 import com.reddate.ddc.config.ConfigCache;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Slf4j
 public class ChargeServiceTest extends BaseServiceTest{
