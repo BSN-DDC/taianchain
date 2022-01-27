@@ -57,9 +57,10 @@
 		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 		<dependency>
 			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>·
-			<version>30.0-android</version>
+			<artifactId>guava</artifactId>
+			<version>30.0-jre</version>
 		</dependency>
+
 
 		<dependency>
 			<groupId>org.fisco.solc</groupId>
