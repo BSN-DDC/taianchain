@@ -28,7 +28,7 @@
     // 初始化SDK配置信息
     static DDCSdkClient ddcSdkClient;
     static {
-        ddcSdkClient = new DDCSdkClient("https://opbtest.bsngate.com:18602/api/projectId/rpc");
+        ddcSdkClient = new DDCSdkClient("https://opbningxia.bsngate.com:18602/api/[project_id]/rpc/");
         Secp256K1SignEventListener signEventListener = null;
         try {
             // 设置签名使用的公私钥
