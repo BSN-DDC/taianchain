@@ -2,8 +2,11 @@
 
 ### 要求
 
+
 **Java 1.8 或 更高**
+
 **在BSN_DDC中已创建项目。网关URL:https://opbningxia.bsngate.com:18602/api/[project_id]/rpc**
+
 **在BSN_DDC中已创建账户**
 
 ### 配置说明
