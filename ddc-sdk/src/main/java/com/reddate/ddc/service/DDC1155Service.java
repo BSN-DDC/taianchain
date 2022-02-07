@@ -1,14 +1,19 @@
 package com.reddate.ddc.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Multimap;
 import com.reddate.ddc.config.ConfigCache;
 import com.reddate.ddc.constant.DDC1155Functions;
 import com.reddate.ddc.constant.ErrorMessage;
+import com.reddate.ddc.dto.taianchain.ReqCallRpcBean;
 import com.reddate.ddc.dto.taianchain.ReqJsonRpcBean;
+import com.reddate.ddc.dto.taianchain.RespCallRpcBean;
 import com.reddate.ddc.dto.taianchain.RespJsonRpcBean;
 import com.reddate.ddc.exception.DDCException;
 import com.reddate.ddc.listener.SignEventListener;
 import com.reddate.ddc.util.AddressUtils;
+import com.reddate.ddc.util.AnalyzeChainInfoUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.fisco.bcos.web3j.tx.txdecode.InputAndOutputResult;
 import org.fisco.bcos.web3j.utils.Strings;
@@ -189,10 +194,15 @@ public class DDC1155Service extends BaseService {
         arrayList.add(owner);
         arrayList.add(operator);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleDDC1155Transaction(ZeroAddress, DDC1155Functions.IsApprovedForAll, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleDDC1155CallTransaction(DDC1155Functions.IsApprovedForAll, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
-        return (String) respJsonRpcBean.getResult();
+
+        String jsonResult = new ObjectMapper().writeValueAsString(respJsonRpcBean.getResult());
+        RespCallRpcBean respCallRpcBean = JSONObject.parseObject(jsonResult, RespCallRpcBean.class);
+        callResultCheck(respCallRpcBean);
+
+        return respCallRpcBean.getOutput();
     }
 
     /**
@@ -458,11 +468,19 @@ public class DDC1155Service extends BaseService {
         arrayList.add(owner);
         arrayList.add(ddcId);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleDDC1155Transaction(ZeroAddress, DDC1155Functions.BalanceOf, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleDDC1155CallTransaction(DDC1155Functions.BalanceOf, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
-        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getDdc1155ABI(), ConfigCache.get().getDdc1155BIN(), respJsonRpcBean.getResult().toString());
+        String encodeParams = new ObjectMapper().writeValueAsString(reqJsonRpcBean.getParams().get(1));
+        ReqCallRpcBean reqCallRpcBean = JSONObject.parseObject(encodeParams, ReqCallRpcBean.class);
+        String encodedFunction = reqCallRpcBean.getData();
+        String jsonResult = new ObjectMapper().writeValueAsString(respJsonRpcBean.getResult());
+        RespCallRpcBean respCallRpcBean = JSONObject.parseObject(jsonResult, RespCallRpcBean.class);
+        callResultCheck(respCallRpcBean);
+
+        InputAndOutputResult inputAndOutputResult = AnalyzeChainInfoUtils.analyzeTransactionOutput(ConfigCache.get().getDdc1155ABI(), ConfigCache.get().getDdc1155BIN(), encodedFunction, respCallRpcBean.getOutput());
+
         return new BigInteger(inputAndOutputResult.getResult().get(0).getData().toString());
     }
 
@@ -490,11 +508,19 @@ public class DDC1155Service extends BaseService {
         params.add(owners.stream().collect(Collectors.joining(",")));
         params.add(ddcIds.stream().collect(Collectors.joining(",")));
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleDDC1155Transaction(ZeroAddress, DDC1155Functions.BalanceOfBatch, params);
+        ReqJsonRpcBean reqJsonRpcBean = assembleDDC1155CallTransaction(DDC1155Functions.BalanceOfBatch, params);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
-        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getDdc1155ABI(), ConfigCache.get().getDdc1155BIN(), respJsonRpcBean.getResult().toString());
+        String encodeParams = new ObjectMapper().writeValueAsString(reqJsonRpcBean.getParams().get(1));
+        ReqCallRpcBean reqCallRpcBean = JSONObject.parseObject(encodeParams, ReqCallRpcBean.class);
+        String encodedFunction = reqCallRpcBean.getData();
+        String jsonResult = new ObjectMapper().writeValueAsString(respJsonRpcBean.getResult());
+        RespCallRpcBean respCallRpcBean = JSONObject.parseObject(jsonResult, RespCallRpcBean.class);
+        callResultCheck(respCallRpcBean);
+
+        InputAndOutputResult inputAndOutputResult = AnalyzeChainInfoUtils.analyzeTransactionOutput(ConfigCache.get().getDdc1155ABI(), ConfigCache.get().getDdc1155BIN(), encodedFunction, respCallRpcBean.getOutput());
+
         ArrayList<BigInteger> result = new ArrayList<>();
         ArrayList<BigInteger> datas = (ArrayList<BigInteger>) inputAndOutputResult.getResult().get(0).getData();
         datas.forEach(it -> {
@@ -518,22 +544,32 @@ public class DDC1155Service extends BaseService {
         ArrayList<Object> arrayList = new ArrayList<>();
         arrayList.add(ddcId);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleDDC1155Transaction(ZeroAddress, DDC1155Functions.DDCURI, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleDDC1155CallTransaction(DDC1155Functions.DDCURI, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
-        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getDdc1155ABI(), ConfigCache.get().getDdc1155BIN(), respJsonRpcBean.getResult().toString());
+        String encodeParams = new ObjectMapper().writeValueAsString(reqJsonRpcBean.getParams().get(1));
+        ReqCallRpcBean reqCallRpcBean = JSONObject.parseObject(encodeParams, ReqCallRpcBean.class);
+        String encodedFunction = reqCallRpcBean.getData();
+        String jsonResult = new ObjectMapper().writeValueAsString(respJsonRpcBean.getResult());
+        RespCallRpcBean respCallRpcBean = JSONObject.parseObject(jsonResult, RespCallRpcBean.class);
+        callResultCheck(respCallRpcBean);
+
+        InputAndOutputResult inputAndOutputResult = AnalyzeChainInfoUtils.analyzeTransactionOutput(ConfigCache.get().getDdc1155ABI(), ConfigCache.get().getDdc1155BIN(), encodedFunction, respCallRpcBean.getOutput());
+
         return inputAndOutputResult.getResult().get(0).getData().toString();
     }
 
     /**
      * 设置URI DDC拥有者和授权者可调用该方法
-     *
+     * @param sender sender
+     * @param owner DDC owner
      * @param ddcId ddcId
-     * @return DDCURI
-     * @throws Exception Exception
+     * @param ddcURI ddcURI
+     * @return
+     * @throws Exception
      */
-    public String setURI(String sender, BigInteger ddcId, String ddcURI) throws Exception {
+    public String setURI(String sender, String owner, BigInteger ddcId, String ddcURI) throws Exception {
 
         if (Strings.isEmpty(sender)) {
             throw new DDCException(ErrorMessage.SENDER_IS_EMPTY);
@@ -541,6 +577,14 @@ public class DDC1155Service extends BaseService {
 
         if (!AddressUtils.isValidAddress(sender)) {
             throw new DDCException(ErrorMessage.SENDER_IS_NOT_ADDRESS_FORMAT);
+        }
+
+        if (Strings.isEmpty(owner)) {
+            throw new DDCException(ErrorMessage.TO_ACCOUNT_IS_EMPTY);
+        }
+
+        if (!AddressUtils.isValidAddress(owner)) {
+            throw new DDCException(ErrorMessage.ACCOUNT_IS_NOT_ADDRESS_FORMAT);
         }
 
         if (null == ddcId) {
@@ -552,6 +596,7 @@ public class DDC1155Service extends BaseService {
         }
 
         ArrayList<Object> arrayList = new ArrayList<>();
+        arrayList.add(owner);
         arrayList.add(ddcId);
         arrayList.add(ddcURI);
 
@@ -559,12 +604,15 @@ public class DDC1155Service extends BaseService {
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
-        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getDdc1155ABI(), ConfigCache.get().getDdc1155BIN(), respJsonRpcBean.getResult().toString());
-        return inputAndOutputResult.getResult().get(0).getData().toString();
+        return (String) respJsonRpcBean.getResult();
     }
 
     private ReqJsonRpcBean assembleDDC1155Transaction(String sender, String functionName, ArrayList<Object> params) throws Exception {
         return assembleTransaction(sender, getBlockNumber(), ConfigCache.get().getDdc1155ABI(), ConfigCache.get().getDdc1155Address(), functionName, params);
+    }
+
+    private ReqJsonRpcBean assembleDDC1155CallTransaction(String functionName, ArrayList<Object> params) throws Exception {
+        return assembleTransaction(OneAddress, new BigInteger("0"), ConfigCache.get().getDdc1155ABI(), ConfigCache.get().getDdc1155Address(), functionName, params);
     }
 
 

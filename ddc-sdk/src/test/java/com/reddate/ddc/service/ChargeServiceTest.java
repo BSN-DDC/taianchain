@@ -37,7 +37,7 @@ public class ChargeServiceTest extends BaseServiceTest{
 		ChargeService chargeService = getChargeService();
 		
 //		String accAddr = Keys.getAddress(new BigInteger("10411698110993959739535609003328767528005678182467896878050524806097812542225230327763618090295889890389743624855091682652783845527766539103610648004292062"));
-		String accAddr = "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63";
+		String accAddr = "0x7e1e4589d8ecd8b40df7891df7060d374aa7959e";
 
 		BigInteger amont = chargeService.balanceOf(accAddr);
 		log.info(amont.toString());

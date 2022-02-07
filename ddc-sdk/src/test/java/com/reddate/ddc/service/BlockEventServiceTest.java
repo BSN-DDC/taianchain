@@ -17,7 +17,7 @@ class BlockEventServiceTest extends BaseServiceTest{
     @Test
     void getBlockEvent() throws BaseException, IOException, InterruptedException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
         ArrayList<Object> result = new ArrayList<>();
-        for (int i = 690210; i < 690211; i++) {
+        for (int i = 1466705; i < 1466706; i++) {
             result.addAll(blockEventService.getBlockEvent(String.valueOf(i)));
         }
         log.info("");

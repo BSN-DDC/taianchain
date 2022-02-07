@@ -33,7 +33,7 @@ class PemUtilTest {
 
     @Test
     public void test() throws Exception {
-        String privateKey = "6b321dfff099412d24b229954ae71a320420f3caf58c75dc63abbd04c7304ee1";
+        String privateKey = "b1e104c4c3d74dc4a9131cde8f3619c1c2d68a442da19dc146159eae0311d8b1";
 
         ECKeyPair ecKeyPair = ECKeyPair.create(new BigInteger(privateKey,16));
         ECPrivateKey ecPrivateKey = PemUtil.toEcPrivateKey(Numeric.toHexStringNoPrefix(ecKeyPair.getPrivateKey()));

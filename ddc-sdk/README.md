@@ -3,7 +3,8 @@
 ### 要求
 
 **Java 1.8 或 更高**
-
+**在BSN_DDC中已创建项目。网关URL:https://opbningxia.bsngate.com:18602/api/[project_id]/rpc**
+**在BSN_DDC中已创建账户**
 
 ### 配置说明
 配置信息硬编码到com.reddate.ddc.config.ConfigCache文件中，如需更换相关配置请修改该文件下的信息

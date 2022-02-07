@@ -1,13 +1,18 @@
 package com.reddate.ddc.service;
 
+import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reddate.ddc.config.ConfigCache;
 import com.reddate.ddc.constant.DDC721Functions;
 import com.reddate.ddc.constant.ErrorMessage;
+import com.reddate.ddc.dto.taianchain.ReqCallRpcBean;
 import com.reddate.ddc.dto.taianchain.ReqJsonRpcBean;
+import com.reddate.ddc.dto.taianchain.RespCallRpcBean;
 import com.reddate.ddc.dto.taianchain.RespJsonRpcBean;
 import com.reddate.ddc.exception.DDCException;
 import com.reddate.ddc.listener.SignEventListener;
 import com.reddate.ddc.util.AddressUtils;
+import com.reddate.ddc.util.AnalyzeChainInfoUtils;
 import org.fisco.bcos.web3j.tx.txdecode.InputAndOutputResult;
 import org.fisco.bcos.web3j.utils.Strings;
 
@@ -162,11 +167,19 @@ public class DDC721Service extends BaseService {
         ArrayList<Object> arrayList = new ArrayList<>();
         arrayList.add(ddcId);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721Transaction(ZeroAddress, DDC721Functions.GET_APPROVED, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721CallTransaction(DDC721Functions.GET_APPROVED, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
-        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), respJsonRpcBean.getResult().toString());
+        String encodeParams = new ObjectMapper().writeValueAsString(reqJsonRpcBean.getParams().get(1));
+        ReqCallRpcBean reqCallRpcBean = JSONObject.parseObject(encodeParams, ReqCallRpcBean.class);
+        String encodedFunction = reqCallRpcBean.getData();
+        String jsonResult = new ObjectMapper().writeValueAsString(respJsonRpcBean.getResult());
+        RespCallRpcBean respCallRpcBean = JSONObject.parseObject(jsonResult, RespCallRpcBean.class);
+        callResultCheck(respCallRpcBean);
+
+        InputAndOutputResult inputAndOutputResult = AnalyzeChainInfoUtils.analyzeTransactionOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), encodedFunction, respCallRpcBean.getOutput());
+
         return inputAndOutputResult.getResult().get(0).getData().toString();
     }
 
@@ -229,11 +242,18 @@ public class DDC721Service extends BaseService {
         arrayList.add(owner);
         arrayList.add(operator);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721Transaction(ZeroAddress, DDC721Functions.IS_APPROVED_FOR_ALL, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721CallTransaction(DDC721Functions.IS_APPROVED_FOR_ALL, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
-        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), respJsonRpcBean.getResult().toString());
+        String encodeParams = new ObjectMapper().writeValueAsString(reqJsonRpcBean.getParams().get(1));
+        ReqCallRpcBean reqCallRpcBean = JSONObject.parseObject(encodeParams, ReqCallRpcBean.class);
+        String encodedFunction = reqCallRpcBean.getData();
+        String jsonResult = new ObjectMapper().writeValueAsString(respJsonRpcBean.getResult());
+        RespCallRpcBean respCallRpcBean = JSONObject.parseObject(jsonResult, RespCallRpcBean.class);
+        callResultCheck(respCallRpcBean);
+
+        InputAndOutputResult inputAndOutputResult = AnalyzeChainInfoUtils.analyzeTransactionOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), encodedFunction, respCallRpcBean.getOutput());
         return Boolean.valueOf(inputAndOutputResult.getResult().get(0).getData().toString());
     }
 
@@ -439,11 +459,18 @@ public class DDC721Service extends BaseService {
         ArrayList<Object> arrayList = new ArrayList<>();
         arrayList.add(owner);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721Transaction(ZeroAddress,DDC721Functions.BALANCE_OF, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721CallTransaction(DDC721Functions.BALANCE_OF, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
-        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), respJsonRpcBean.getResult().toString());
+        String encodeParams = new ObjectMapper().writeValueAsString(reqJsonRpcBean.getParams().get(1));
+        ReqCallRpcBean reqCallRpcBean = JSONObject.parseObject(encodeParams, ReqCallRpcBean.class);
+        String encodedFunction = reqCallRpcBean.getData();
+        String jsonResult = new ObjectMapper().writeValueAsString(respJsonRpcBean.getResult());
+        RespCallRpcBean respCallRpcBean = JSONObject.parseObject(jsonResult, RespCallRpcBean.class);
+        callResultCheck(respCallRpcBean);
+
+        InputAndOutputResult inputAndOutputResult = AnalyzeChainInfoUtils.analyzeTransactionOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), encodedFunction, respCallRpcBean.getOutput());
         return new BigInteger(inputAndOutputResult.getResult().get(0).getData().toString());
     }
 
@@ -463,11 +490,18 @@ public class DDC721Service extends BaseService {
         ArrayList<Object> arrayList = new ArrayList<>();
         arrayList.add(ddcId);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721Transaction(ZeroAddress,DDC721Functions.OWNER_OF, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721CallTransaction(DDC721Functions.OWNER_OF, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
-        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), respJsonRpcBean.getResult().toString());
+        String encodeParams = new ObjectMapper().writeValueAsString(reqJsonRpcBean.getParams().get(1));
+        ReqCallRpcBean reqCallRpcBean = JSONObject.parseObject(encodeParams, ReqCallRpcBean.class);
+        String encodedFunction = reqCallRpcBean.getData();
+        String jsonResult = new ObjectMapper().writeValueAsString(respJsonRpcBean.getResult());
+        RespCallRpcBean respCallRpcBean = JSONObject.parseObject(jsonResult, RespCallRpcBean.class);
+        callResultCheck(respCallRpcBean);
+
+        InputAndOutputResult inputAndOutputResult = AnalyzeChainInfoUtils.analyzeTransactionOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), encodedFunction, respCallRpcBean.getOutput());
         return inputAndOutputResult.getResult().get(0).getData().toString();
     }
 
@@ -480,11 +514,18 @@ public class DDC721Service extends BaseService {
     public String name() throws Exception {
 
         ArrayList<Object> arrayList = new ArrayList<>();
-        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721Transaction(ZeroAddress,DDC721Functions.NAME, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721CallTransaction(DDC721Functions.NAME, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
-        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), respJsonRpcBean.getResult().toString());
+        String encodeParams = new ObjectMapper().writeValueAsString(reqJsonRpcBean.getParams().get(1));
+        ReqCallRpcBean reqCallRpcBean = JSONObject.parseObject(encodeParams, ReqCallRpcBean.class);
+        String encodedFunction = reqCallRpcBean.getData();
+        String jsonResult = new ObjectMapper().writeValueAsString(respJsonRpcBean.getResult());
+        RespCallRpcBean respCallRpcBean = JSONObject.parseObject(jsonResult, RespCallRpcBean.class);
+        callResultCheck(respCallRpcBean);
+
+        InputAndOutputResult inputAndOutputResult = AnalyzeChainInfoUtils.analyzeTransactionOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), encodedFunction, respCallRpcBean.getOutput());
         return inputAndOutputResult.getResult().get(0).getData().toString();
     }
 
@@ -497,11 +538,18 @@ public class DDC721Service extends BaseService {
     public String symbol() throws Exception {
 
         ArrayList<Object> arrayList = new ArrayList<>();
-        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721Transaction(ZeroAddress,DDC721Functions.SYMBOL, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721CallTransaction(DDC721Functions.SYMBOL, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
-        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), respJsonRpcBean.getResult().toString());
+        String encodeParams = new ObjectMapper().writeValueAsString(reqJsonRpcBean.getParams().get(1));
+        ReqCallRpcBean reqCallRpcBean = JSONObject.parseObject(encodeParams, ReqCallRpcBean.class);
+        String encodedFunction = reqCallRpcBean.getData();
+        String jsonResult = new ObjectMapper().writeValueAsString(respJsonRpcBean.getResult());
+        RespCallRpcBean respCallRpcBean = JSONObject.parseObject(jsonResult, RespCallRpcBean.class);
+        callResultCheck(respCallRpcBean);
+
+        InputAndOutputResult inputAndOutputResult = AnalyzeChainInfoUtils.analyzeTransactionOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), encodedFunction, respCallRpcBean.getOutput());
         return inputAndOutputResult.getResult().get(0).getData().toString();
     }
 
@@ -519,11 +567,18 @@ public class DDC721Service extends BaseService {
         ArrayList<Object> arrayList = new ArrayList<>();
         arrayList.add(ddcId);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721Transaction(ZeroAddress,DDC721Functions.DDC_URI, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleDDC721CallTransaction(DDC721Functions.DDC_URI, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
-        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), respJsonRpcBean.getResult().toString());
+        String encodeParams = new ObjectMapper().writeValueAsString(reqJsonRpcBean.getParams().get(1));
+        ReqCallRpcBean reqCallRpcBean = JSONObject.parseObject(encodeParams, ReqCallRpcBean.class);
+        String encodedFunction = reqCallRpcBean.getData();
+        String jsonResult = new ObjectMapper().writeValueAsString(respJsonRpcBean.getResult());
+        RespCallRpcBean respCallRpcBean = JSONObject.parseObject(jsonResult, RespCallRpcBean.class);
+        callResultCheck(respCallRpcBean);
+
+        InputAndOutputResult inputAndOutputResult = AnalyzeChainInfoUtils.analyzeTransactionOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), encodedFunction, respCallRpcBean.getOutput());
         return inputAndOutputResult.getResult().get(0).getData().toString();
     }
 
@@ -553,12 +608,15 @@ public class DDC721Service extends BaseService {
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
-        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721BIN(), respJsonRpcBean.getResult().toString());
-        return inputAndOutputResult.getResult().get(0).getData().toString();
+        return (String) respJsonRpcBean.getResult();
     }
 
     private ReqJsonRpcBean assembleDDC721Transaction(String sender,String functionName, ArrayList<Object> params) throws Exception {
         return assembleTransaction(sender,getBlockNumber(), ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721Address(), functionName, params);
+    }
+
+    private ReqJsonRpcBean assembleDDC721CallTransaction(String functionName, ArrayList<Object> params) throws Exception {
+        return assembleTransaction(OneAddress, new BigInteger("0"), ConfigCache.get().getDdc721ABI(), ConfigCache.get().getDdc721Address(), functionName, params);
     }
 
 }

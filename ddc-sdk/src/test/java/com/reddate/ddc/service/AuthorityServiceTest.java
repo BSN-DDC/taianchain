@@ -118,6 +118,7 @@ public class AuthorityServiceTest extends BaseServiceTest{
         String burn = "0x42966c68";
         String freeeze = "0xd7a78db8";
         String unFreeze = "0xd302b0dc";
+        String setURI   = "0x862440e2";
 
         sigList.add(mint);
         sigList.add(freeeze);
@@ -127,6 +128,7 @@ public class AuthorityServiceTest extends BaseServiceTest{
         sigList.add(safeTransferFrom);
         sigList.add(transferFrom);
         sigList.add(burn);
+        sigList.add(setURI);
 
 
         sigList.forEach(sig -> {
@@ -188,6 +190,7 @@ public class AuthorityServiceTest extends BaseServiceTest{
         String balanceOf             = "0x00fdd58e";
         String balanceOfBatch        = "0x4e1273f4";
         String ddcURI                = "0x293ec97c";
+        String setURI                = "0x685e8247";
 
         sigList.add(safeMint);
         sigList.add(safeMintBatch);
@@ -202,6 +205,7 @@ public class AuthorityServiceTest extends BaseServiceTest{
         sigList.add(balanceOf);
         sigList.add(balanceOfBatch);
         sigList.add(ddcURI);
+        sigList.add(setURI);
 
         sigList.forEach( sig -> {
             String txHash = null;

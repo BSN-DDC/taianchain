@@ -3,6 +3,9 @@ package com.reddate.ddc.service;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.reddate.ddc.config.ConfigCache;
+import com.reddate.ddc.dto.ddc.DDC1155TransferSingleEventBean;
+import com.reddate.ddc.dto.ddc.DDC721TransferEventBean;
+import com.reddate.ddc.dto.taianchain.TransactionRecepitBean;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
@@ -23,10 +26,25 @@ class DDC1155ServiceTest extends BaseServiceTest {
 
     @Test
     void mint() throws Exception {
-        String tx = getDDC1155Service().safeMint(consumerAddress, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", new BigInteger("100"), "Token1", "test additional data".getBytes());
+        String tx = getDDC1155Service().safeMint(consumerAddress, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", new BigInteger("100"), "", "test additional data".getBytes());
         log.info(tx);
         assertNotNull(tx);
-        log.info(analyzeRecepit(tx, abi, bin));
+
+        while (true) {
+            TransactionRecepitBean transactionRecepitBean = getDDC1155Service().getTransactionRecepit(tx);
+            if (transactionRecepitBean == null) {
+                Thread.sleep(200 * 2);
+                continue;
+            }
+            BlockEventService blockEventService = new BlockEventService();
+            ArrayList result = blockEventService.getBlockEvent(transactionRecepitBean.getBlockNumber());
+            result.forEach(t -> {
+                if (t instanceof DDC1155TransferSingleEventBean) {
+                    log.info("{}:DDCID {}", t.getClass(), ((DDC1155TransferSingleEventBean) t).getDdcId());
+                }
+            });
+            break;
+        }
     }
 
     @Test
@@ -132,16 +150,16 @@ class DDC1155ServiceTest extends BaseServiceTest {
 
     @Test
     void ddcURI() throws Exception {
-        for (int i = 1; i < 100; i++) {
+        for (int i = 80; i < 81; i++) {
             String result = getDDC1155Service().ddcURI(new BigInteger(String.valueOf(i)));
             assertNotNull(result);
-            log.info("URL: {}", result);
+            log.info("URI: {}", result);
         }
     }
 
     @Test
     void setURI() throws Exception {
-        String tx = getDDC1155Service().setURI(consumerAddress ,new BigInteger(""),"");
+        String tx = getDDC1155Service().setURI(consumerAddress, consumerAddress, new BigInteger("80"),"test76");
         log.info(tx);
         assertNotNull(tx);
         log.info(analyzeRecepit(tx,abi,bin));

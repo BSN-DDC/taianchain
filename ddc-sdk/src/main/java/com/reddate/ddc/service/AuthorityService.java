@@ -1,16 +1,22 @@
 package com.reddate.ddc.service;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reddate.ddc.config.ConfigCache;
 import com.reddate.ddc.constant.AuthorityFunctions;
 import com.reddate.ddc.constant.ErrorMessage;
 import com.reddate.ddc.dto.ddc.AccountInfo;
 import com.reddate.ddc.dto.ddc.AccountRole;
 import com.reddate.ddc.dto.ddc.AccountState;
+import com.reddate.ddc.dto.taianchain.ReqCallRpcBean;
 import com.reddate.ddc.dto.taianchain.ReqJsonRpcBean;
+import com.reddate.ddc.dto.taianchain.RespCallRpcBean;
 import com.reddate.ddc.dto.taianchain.RespJsonRpcBean;
 import com.reddate.ddc.exception.DDCException;
 import com.reddate.ddc.listener.SignEventListener;
 import com.reddate.ddc.util.AddressUtils;
+import com.reddate.ddc.util.AnalyzeChainInfoUtils;
 import com.reddate.ddc.util.HexUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +27,7 @@ import org.fisco.bcos.web3j.tx.txdecode.InputAndOutputResult;
 import org.fisco.bcos.web3j.tx.txdecode.ResultEntity;
 import org.fisco.bcos.web3j.utils.Strings;
 
+import java.math.BigInteger;
 import java.util.*;
 
 @Slf4j
@@ -75,10 +82,9 @@ public class AuthorityService extends BaseService {
 
 
     /**
+     * 运营方可以通过调用该方法直接对平台方或平台方的终端用户进行创建。
      *
-     *   运营方可以通过调用该方法直接对平台方或平台方的终端用户进行创建。
-     *
-     * @param sender 调用者地址
+     * @param sender    调用者地址
      * @param account   DDC链账户地址
      * @param accName   DDC账户对应的账户名称
      * @param accDID    DDC账户对应的DID信息
@@ -108,7 +114,7 @@ public class AuthorityService extends BaseService {
         }
 
         if (Strings.isEmpty(leaderDID)) {
-            log.info("{} ,will add platform account",ErrorMessage.ACCOUNT_LEADER_DID_IS_EMPTY.getMessage());
+            log.info("{} ,will add platform account", ErrorMessage.ACCOUNT_LEADER_DID_IS_EMPTY.getMessage());
             leaderDID = "";
         }
 
@@ -119,7 +125,7 @@ public class AuthorityService extends BaseService {
         arrayList.add(new Utf8String(leaderDID));
 
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(sender,AuthorityFunctions.AddAccountByOperator, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(sender, AuthorityFunctions.AddAccountByOperator, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
         return (String) respJsonRpcBean.getResult();
@@ -128,7 +134,7 @@ public class AuthorityService extends BaseService {
     /**
      * 删除账户
      *
-     * @param sender 调用者地址
+     * @param sender  调用者地址
      * @param account DDC链账户地址
      * @return 返回交易哈希
      * @throws Exception
@@ -148,7 +154,7 @@ public class AuthorityService extends BaseService {
 
         ArrayList<Object> arrayList = new ArrayList<>();
         arrayList.add(new Address(account));
-        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(sender,AuthorityFunctions.DelAccount, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(sender, AuthorityFunctions.DelAccount, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
         return (String) respJsonRpcBean.getResult();
@@ -174,11 +180,22 @@ public class AuthorityService extends BaseService {
         ArrayList<Object> arrayList = new ArrayList<>();
         arrayList.add(account);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(ZeroAddress, AuthorityFunctions.GetAccount, arrayList);
+        // 发送请求账户信息请求
+        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityCallTransaction(AuthorityFunctions.GetAccount, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
-        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getAuthorityLogicABI(), ConfigCache.get().getAuthorityLogicBIN(), (String) respJsonRpcBean.getResult());
+        String encodeParams = new ObjectMapper().writeValueAsString(reqJsonRpcBean.getParams().get(1));
+        ReqCallRpcBean reqCallRpcBean = JSONObject.parseObject(encodeParams, ReqCallRpcBean.class);
+        String encodedFunction = reqCallRpcBean.getData();
+
+        String jsonResult = new ObjectMapper().writeValueAsString(respJsonRpcBean.getResult());
+        RespCallRpcBean respCallRpcBean = JSONObject.parseObject(jsonResult, RespCallRpcBean.class);
+        callResultCheck(respCallRpcBean);
+
+        // 解析交易返回信息
+        InputAndOutputResult inputAndOutputResult = AnalyzeChainInfoUtils.analyzeTransactionOutput(ConfigCache.get().getAuthorityLogicABI(), ConfigCache.get().getAuthorityLogicBIN(), encodedFunction, respCallRpcBean.getOutput());
+
         AccountInfo accountInfo = new AccountInfo();
         accountInfo.setAccountDID(String.valueOf(inputAndOutputResult.getResult().get(0).getData()));
         accountInfo.setAccountName(String.valueOf(inputAndOutputResult.getResult().get(1).getData()));
@@ -203,6 +220,7 @@ public class AuthorityService extends BaseService {
 
     /**
      * 跨平台授权链账户转移DDC
+     *
      * @param sender
      * @param from
      * @param to
@@ -210,7 +228,7 @@ public class AuthorityService extends BaseService {
      * @return
      * @throws Exception
      */
-    public String crossPlatformApproval(String sender,String from,String to,boolean approved) throws Exception {
+    public String crossPlatformApproval(String sender, String from, String to, boolean approved) throws Exception {
         if (Strings.isEmpty(sender)) {
             throw new DDCException(ErrorMessage.SENDER_IS_EMPTY);
         }
@@ -232,7 +250,7 @@ public class AuthorityService extends BaseService {
         arrayList.add(new Address(to));
         arrayList.add(approved);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(sender,AuthorityFunctions.CrossPlatformApproval, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(sender, AuthorityFunctions.CrossPlatformApproval, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
         return (String) respJsonRpcBean.getResult();
@@ -241,7 +259,7 @@ public class AuthorityService extends BaseService {
     /**
      * 运营方或平台方通过该方法进行DDC账户信息状态的更改。
      *
-     * @param sender 调用者地址
+     * @param sender  调用者地址
      * @param account DDC用户链账户地址
      * @param state   状态 ：Frozen - 冻结状态 ； Active - 活跃状态
      * @return 返回交易哈希
@@ -274,7 +292,7 @@ public class AuthorityService extends BaseService {
         arrayList.add(state.getStatus());
         arrayList.add(changePlatformState);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(sender,AuthorityFunctions.UpdateAccountState, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(sender, AuthorityFunctions.UpdateAccountState, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
         return (String) respJsonRpcBean.getResult();
@@ -306,10 +324,18 @@ public class AuthorityService extends BaseService {
         arrayList.add(role.getRole());
         arrayList.add(new Address(ddcAddr));
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(ZeroAddress, AuthorityFunctions.GetFunction, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityCallTransaction(AuthorityFunctions.GetFunction, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
-        InputAndOutputResult inputAndOutputResult = analyzeTransactionRecepitOutput(ConfigCache.get().getAuthorityLogicABI(), ConfigCache.get().getAuthorityLogicBIN(), (String) respJsonRpcBean.getResult());
+
+        String encodeParams = new ObjectMapper().writeValueAsString(reqJsonRpcBean.getParams().get(1));
+        ReqCallRpcBean reqCallRpcBean = JSONObject.parseObject(encodeParams, ReqCallRpcBean.class);
+        String encodedFunction = reqCallRpcBean.getData();
+        String jsonResult = new ObjectMapper().writeValueAsString(respJsonRpcBean.getResult());
+        RespCallRpcBean respCallRpcBean = JSONObject.parseObject(jsonResult, RespCallRpcBean.class);
+        callResultCheck(respCallRpcBean);
+
+        InputAndOutputResult inputAndOutputResult = AnalyzeChainInfoUtils.analyzeTransactionOutput(ConfigCache.get().getAuthorityLogicABI(), ConfigCache.get().getAuthorityLogicBIN(), encodedFunction, respCallRpcBean.getOutput());
 
         ArrayList<String> list = new ArrayList<>();
         List<ResultEntity> functionList = inputAndOutputResult.getResult();
@@ -318,7 +344,7 @@ public class AuthorityService extends BaseService {
 
                 ArrayList<Bytes4> dataList = (ArrayList<Bytes4>) resultEntity.getTypeObject().getValue();
                 dataList.forEach(data -> {
-                    list.add("0x"+Hex.toHexString(data.getValue()));
+                    list.add("0x" + Hex.toHexString(data.getValue()));
                 });
 
             }
@@ -329,7 +355,7 @@ public class AuthorityService extends BaseService {
     /**
      * 添加角色对方法的调用权限
      *
-     * @param sender 调用者地址
+     * @param sender  调用者地址
      * @param ddcAddr 合约地址
      * @param role    角色
      * @param sig     签名
@@ -370,7 +396,7 @@ public class AuthorityService extends BaseService {
         arrayList.add(new Address(ddcAddr));
         arrayList.add(sig);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(sender,AuthorityFunctions.DelFunction, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(sender, AuthorityFunctions.DelFunction, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
@@ -380,7 +406,7 @@ public class AuthorityService extends BaseService {
     /**
      * 删除角色对方法的调用权限
      *
-     * @param sender 调用者地址
+     * @param sender  调用者地址
      * @param ddcAddr 合约地址
      * @param role    角色
      * @param sig     签名
@@ -421,7 +447,7 @@ public class AuthorityService extends BaseService {
         arrayList.add(new Address(ddcAddr));
         arrayList.add(sig);
 
-        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(sender,AuthorityFunctions.AddFunction, arrayList);
+        ReqJsonRpcBean reqJsonRpcBean = assembleAuthorityTransaction(sender, AuthorityFunctions.AddFunction, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
         resultCheck(respJsonRpcBean);
 
@@ -429,8 +455,12 @@ public class AuthorityService extends BaseService {
     }
 
 
-    private ReqJsonRpcBean assembleAuthorityTransaction(String sender,String functionName, ArrayList<Object> params) throws Exception {
-        return assembleTransaction(sender,getBlockNumber(), ConfigCache.get().getAuthorityLogicABI(), ConfigCache.get().getAuthorityLogicAddress(), functionName, params);
+    private ReqJsonRpcBean assembleAuthorityTransaction(String sender, String functionName, ArrayList<Object> params) throws Exception {
+        return assembleTransaction(sender, getBlockNumber(), ConfigCache.get().getAuthorityLogicABI(), ConfigCache.get().getAuthorityLogicAddress(), functionName, params);
+    }
+
+    private ReqJsonRpcBean assembleAuthorityCallTransaction(String functionName, ArrayList<Object> params) throws Exception {
+        return assembleTransaction(OneAddress, new BigInteger("0"), ConfigCache.get().getAuthorityLogicABI(), ConfigCache.get().getAuthorityLogicAddress(), functionName, params);
     }
 
 }

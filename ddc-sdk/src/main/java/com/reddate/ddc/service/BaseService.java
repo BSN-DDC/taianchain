@@ -29,6 +29,8 @@ public class BaseService {
     protected SignEventListener signEventListener;
 
     public static final String ZeroAddress = "0x0000000000000000000000000000000000000000";
+    // 任意地址，用以发送call
+    public static final String OneAddress = "0x0000000000000000000000000000000000000001";
     /**
      * 组装交易
      *
@@ -58,18 +60,8 @@ public class BaseService {
         	log.error("assembleTransaction {}",ErrorMessage.SENDER_IS_EMPTY);
         	throw new DDCException(ErrorMessage.SENDER_IS_EMPTY);
         }
-        
-        
-        byte[] signedResult = SignedTransactionsUtils.buildTrans(reqTransBean, signEventListener, sender, blockHeight);
 
-        ReqJsonRpcBean reqJsonRpcBean = new ReqJsonRpcBean();
-        reqJsonRpcBean.setMethod(FiscoFunctions.SendRawTransaction);
-        reqJsonRpcBean.setId(1);
-        reqJsonRpcBean.setJsonrpc("2.0");
-        List<Object> jsonParams = new ArrayList<>();
-        jsonParams.add(1);
-        jsonParams.add(new String(signedResult));
-        reqJsonRpcBean.setParams(jsonParams);
+        ReqJsonRpcBean reqJsonRpcBean = SignedTransactionsUtils.buildTrans(reqTransBean, signEventListener, sender, blockHeight);
 
         return reqJsonRpcBean;
     }
@@ -213,6 +205,20 @@ public class BaseService {
         if (respJsonRpcBean.getError() != null) {
             log.error("resultCheck {}",respJsonRpcBean.getError().toString());
             throw new DDCException(ErrorMessage.REQUEST_FAILED, respJsonRpcBean.getError());
+        }
+
+    }
+
+    // 校验call方法的结果
+    public void callResultCheck(RespCallRpcBean respCallRpcBean) {
+        if (null == respCallRpcBean) {
+            log.error("callResultCheck {}",ErrorMessage.REQUEST_FAILED);
+            throw new DDCException(ErrorMessage.REQUEST_FAILED);
+        }
+
+        if (respCallRpcBean.getStatus().equals("0x16")) {
+            log.error("callResultCheck {}",respCallRpcBean.getStatus());
+            throw new DDCException(ErrorMessage.REQUEST_FAILED.getCode(), respCallRpcBean.toString());
         }
     }
 }

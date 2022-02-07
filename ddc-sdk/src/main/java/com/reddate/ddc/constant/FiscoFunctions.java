@@ -11,5 +11,6 @@ public class FiscoFunctions {
     public static final String GetTransactionByHash = "getTransactionByHash";
     public static final String GetTransactionReceipt = "getTransactionReceipt";
     public static final String SendRawTransaction = "sendRawTransaction";
+    public static final String Call = "call";
 
 }

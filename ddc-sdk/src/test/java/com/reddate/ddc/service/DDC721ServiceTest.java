@@ -102,7 +102,7 @@ class DDC721ServiceTest extends BaseServiceTest {
     void safeTransferFrom() throws Exception {
         byte[] data = new byte[1];
         data[0] = 1;
-        String tx = getDDC721Service().safeTransferFrom(consumerAddress, "0xb0031aa7725a6828bcce4f0b90cfe451c31c1e63", "0x5c5101afe03b416b9735f40ddc3ba7b0c354a5a0", new BigInteger("150"), data);
+        String tx = getDDC721Service().safeTransferFrom(consumerAddress, "0xb0031aa7725a6828bcce4f0b90cfe451c31c1e63", "0x5c5101afe03b416b9735f40ddc3ba7b0c354a5a0", new BigInteger("83"), data);
         log.info(tx);
         log.info(analyzeRecepit(tx, abi, bin));
         assertNotNull(tx);
@@ -118,7 +118,7 @@ class DDC721ServiceTest extends BaseServiceTest {
 
     @Test
     void freeze() throws Exception {
-        String tx = getDDC721Service().freeze(consumerAddress, new BigInteger("132"));
+        String tx = getDDC721Service().freeze(consumerAddress, new BigInteger("84"));
         log.info(tx);
         log.info(analyzeRecepit(tx, abi, bin));
         assertNotNull(tx);
@@ -127,7 +127,7 @@ class DDC721ServiceTest extends BaseServiceTest {
 
     @Test
     void unFreeze() throws Exception {
-        String tx = getDDC721Service().unFreeze(consumerAddress, new BigInteger("132"));
+        String tx = getDDC721Service().unFreeze(consumerAddress, new BigInteger("84"));
         log.info(tx);
         log.info(analyzeRecepit(tx, abi, bin));
         assertNotNull(tx);
