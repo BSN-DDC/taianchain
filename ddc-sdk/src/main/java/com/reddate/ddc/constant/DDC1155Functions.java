@@ -20,4 +20,5 @@ public class DDC1155Functions {
     public static final String DDC1155TransferBatchEvent = "TransferBatch(address,address,address,uint256[],uint256[])";
     public static final String DDC1155FreezeEvent = "EnterBlacklist(address,uint256)";
     public static final String DDC1155UnFreezeEvent = "ExitBlacklist(address,uint256)";
+    public static final String DDC1155SetURIEvent = "SetURI(uint256,string)";
 }

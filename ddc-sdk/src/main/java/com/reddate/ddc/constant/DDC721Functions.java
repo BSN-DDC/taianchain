@@ -27,5 +27,6 @@ public class DDC721Functions {
     public static final String DDC721TransferEvent = "Transfer(address,address,uint256)";
     public static final String DDC721FreezeEvent = "EnterBlacklist(address,uint256)";
     public static final String DDC721UnFreezeEvent = "ExitBlacklist(address,uint256)";
+    public static final String DDC721SetURIEvent = "SetURI(uint256,string)";
 
 }

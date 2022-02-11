@@ -50,11 +50,13 @@ public class BlockEventService extends BaseService {
         eventBeanMap.put(DDC721Functions.DDC721TransferEvent, DDC721TransferEventBean.class);
         eventBeanMap.put(DDC721Functions.DDC721FreezeEvent, DDC721FreezeEventBean.class);
         eventBeanMap.put(DDC721Functions.DDC721UnFreezeEvent, DDC721UnFreezeEventBean.class);
+        eventBeanMap.put(DDC721Functions.DDC721SetURIEvent, DDC721SetURIEventBean.class);
 
         eventBeanMap.put(DDC1155Functions.DDC1155TransferSingleEvent, DDC1155TransferSingleEventBean.class);
         eventBeanMap.put(DDC1155Functions.DDC1155TransferBatchEvent, DDC1155TransferBatchEventBean.class);
         eventBeanMap.put(DDC1155Functions.DDC1155FreezeEvent, DDC1155FreezeEventBean.class);
         eventBeanMap.put(DDC1155Functions.DDC1155UnFreezeEvent, DDC1155UnFreezeEventBean.class);
+        eventBeanMap.put(DDC1155Functions.DDC1155SetURIEvent, DDC1155SetURIEventBean.class);
     }
 
     /**
