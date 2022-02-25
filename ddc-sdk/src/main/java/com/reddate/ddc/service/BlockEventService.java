@@ -37,26 +37,26 @@ public class BlockEventService extends BaseService {
     public HashMap<String, Class> eventBeanMap = new HashMap<>();
 
     public BlockEventService() {
-        // 进行事件方法与实体类的绑定
-        eventBeanMap.put(AuthorityFunctions.AddAccountEvent, AddAccountEventBean.class);
-        eventBeanMap.put(AuthorityFunctions.UpdateAccountStateEvent, UpdateAccountStateEventBean.class);
+        // 进行事件方法与实体类的绑定 key为 address+方法名称用来保证唯一
+        eventBeanMap.put(ConfigCache.get().getAuthorityLogicAddress() + AuthorityFunctions.AddAccountEvent, AddAccountEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getAuthorityLogicAddress() + AuthorityFunctions.UpdateAccountStateEvent, UpdateAccountStateEventBean.class);
 
-        eventBeanMap.put(ChargeFunctions.RechargeEvent, ReChargeEventBean.class);
-        eventBeanMap.put(ChargeFunctions.PayEvent, PayEventBean.class);
-        eventBeanMap.put(ChargeFunctions.SetFeeEvent, SetFeeEventBean.class);
-        eventBeanMap.put(ChargeFunctions.DelFeeEvent, DeleteFeeEventBean.class);
-        eventBeanMap.put(ChargeFunctions.DelDDCEvent, DeleteDDCEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getChargeLogicAddress() + ChargeFunctions.RechargeEvent, ReChargeEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getChargeLogicAddress() + ChargeFunctions.PayEvent, PayEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getChargeLogicAddress() + ChargeFunctions.SetFeeEvent, SetFeeEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getChargeLogicAddress() + ChargeFunctions.DelFeeEvent, DeleteFeeEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getChargeLogicAddress() + ChargeFunctions.DelDDCEvent, DeleteDDCEventBean.class);
 
-        eventBeanMap.put(DDC721Functions.DDC721TransferEvent, DDC721TransferEventBean.class);
-        eventBeanMap.put(DDC721Functions.DDC721FreezeEvent, DDC721FreezeEventBean.class);
-        eventBeanMap.put(DDC721Functions.DDC721UnFreezeEvent, DDC721UnFreezeEventBean.class);
-        eventBeanMap.put(DDC721Functions.DDC721SetURIEvent, DDC721SetURIEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getDdc721Address() + DDC721Functions.DDC721TransferEvent, DDC721TransferEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getDdc721Address() + DDC721Functions.DDC721FreezeEvent, DDC721FreezeEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getDdc721Address() + DDC721Functions.DDC721UnFreezeEvent, DDC721UnFreezeEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getDdc721Address() + DDC721Functions.DDC721SetURIEvent, DDC721SetURIEventBean.class);
 
-        eventBeanMap.put(DDC1155Functions.DDC1155TransferSingleEvent, DDC1155TransferSingleEventBean.class);
-        eventBeanMap.put(DDC1155Functions.DDC1155TransferBatchEvent, DDC1155TransferBatchEventBean.class);
-        eventBeanMap.put(DDC1155Functions.DDC1155FreezeEvent, DDC1155FreezeEventBean.class);
-        eventBeanMap.put(DDC1155Functions.DDC1155UnFreezeEvent, DDC1155UnFreezeEventBean.class);
-        eventBeanMap.put(DDC1155Functions.DDC1155SetURIEvent, DDC1155SetURIEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getDdc1155Address() + DDC1155Functions.DDC1155TransferSingleEvent, DDC1155TransferSingleEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getDdc1155Address() + DDC1155Functions.DDC1155TransferBatchEvent, DDC1155TransferBatchEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getDdc1155Address() + DDC1155Functions.DDC1155FreezeEvent, DDC1155FreezeEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getDdc1155Address() + DDC1155Functions.DDC1155UnFreezeEvent, DDC1155UnFreezeEventBean.class);
+        eventBeanMap.put(ConfigCache.get().getDdc1155Address() + DDC1155Functions.DDC1155SetURIEvent, DDC1155SetURIEventBean.class);
     }
 
     /**
@@ -129,7 +129,7 @@ public class BlockEventService extends BaseService {
             }
             ArrayList<Log> logs = new ArrayList<>();
             logs.add(log);
-            arrayList.addAll(analyzeEventsByLog(abi, bin, transaction, blockInfoBean, logs));
+            arrayList.addAll(analyzeEventsByLog(log.getAddress().toLowerCase(), abi, bin, transaction, blockInfoBean, logs));
         }
 
         return arrayList;
@@ -148,18 +148,23 @@ public class BlockEventService extends BaseService {
      * @throws BaseException
      * @throws IOException
      */
-    private <T extends BaseEventBean> ArrayList<T> analyzeEventsByLog(String abi, String bin, TransactionInfoBean transaction, BlockInfoBean blockInfoBean, ArrayList<Log> logs) throws BaseException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
+    private <T extends BaseEventBean> ArrayList<T> analyzeEventsByLog(String logAddress, String abi, String bin, TransactionInfoBean transaction, BlockInfoBean blockInfoBean, ArrayList<Log> logs) throws BaseException, IOException, InvocationTargetException, IllegalAccessException, NoSuchMethodException, InstantiationException {
         ArrayList<T> arrayList = new ArrayList<>();
         // 解析交易回执中的事件
         Map<String, List<List<EventResultEntity>>> map = AnalyzeChainInfoUtils.analyzeEventLog(abi, bin, JSONObject.toJSONString(logs));
 
         // 将回执事件转换为对象
         for (Map.Entry<String, Class> entry : eventBeanMap.entrySet()) {
-            if (!map.containsKey(entry.getKey())) {
+            String keyWithAddress = entry.getKey();
+            // 合约地址
+            String mapAddress = keyWithAddress.substring(0, logAddress.length());
+            // 合约方法
+            String mapFunctuin = keyWithAddress.substring(logAddress.length());
+            if (!(map.containsKey(mapFunctuin) && logAddress.equals(mapAddress.toLowerCase()))) {
                 continue;
             }
 
-            List<List<EventResultEntity>> eventLists = map.get(entry.getKey());
+            List<List<EventResultEntity>> eventLists = map.get(mapFunctuin);
             for (List<EventResultEntity> eventList : eventLists) {
                 T eventBean = (T) assembleBeanByReflect(eventList, entry.getValue());
                 eventBean.setBlockHash(blockInfoBean.getHash());
