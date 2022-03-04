@@ -1,22 +1,22 @@
 ## ddc-sdk-taian
 
-### 要求
+### Requirements
 
 
-**Java 1.8 或 更高**
+**Java 1.8 or higher version**
 
-**在BSN_DDC中已创建项目。网关URL:https://opbningxia.bsngate.com:18602/api/[project_id]/rpc**
+**Already created a project in the BSN-DDC Network. Gateway URL:https://opbningxia.bsngate.com:18602/api/[project_id]/rpc**
 
-**在BSN_DDC中已创建账户**
+**Already created a chain account in the BSN-DDC Network**
 
-### 配置说明
-配置信息硬编码到com.reddate.ddc.config.ConfigCache文件中，如需更换相关配置请修改该文件下的信息
+### Configuration description
+Configuration information is hard-coded into the com.reddate.ddc.config.ConfigCache file, if you need to replace the relevant configuration please modify the information in this file
 
-### 调用示例
+### Call example
 
-1. 创建链账户
+1. Create a chain account
 ```
-    // 生成链账户
+    // Generate a chain account
     public void generatePem() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException, InvalidKeySpecException {
         Account account = PemUtil.createAccount();
         System.out.println(account.getPrivateKey());
@@ -26,15 +26,15 @@
 
 ```
 
-2. 初始化SDK实例
+2. Initialize the SDK instance
 ```
-    // 初始化SDK配置信息
+    // Initialize the SDK configuration information
     static DDCSdkClient ddcSdkClient;
     static {
         ddcSdkClient = new DDCSdkClient("https://opbningxia.bsngate.com:18602/api/[project_id]/rpc/");
         Secp256K1SignEventListener signEventListener = null;
         try {
-            // 设置签名使用的公私钥
+            // Set the private and public keys used to sign the message
             signEventListener = new Secp256K1SignEventListener(ecPrivateKeyPem, ecPublicKeyPem);
         } catch (Exception e) {
             e.printStackTrace();
@@ -42,17 +42,17 @@
         ddcSdkClient.registerSignListener(signEventListener);
     }
     
-    // 每个合约的实例通过sdk获取，此处以获取721实例为例
+    // Instances of each contract are obtained by SDK. Here we use DDC721 instance as an example
     private DDC721Service getDDC721Service() {
         return sdk.getDDC721Service();
     }
 
 ```
 
-3. 调用合约方法进行DDC的发行、流转
+3. Call the functions in the contract to mint and transfer DDCs
 ```
-    //通过合约的实例进行该合约内方法的调用，此处以发行、查看ddcId、流转一个DDC721为例
-    //发行、查看DDC
+    //Call the functions in the contract by the instances of the contract. Here we mint AND transfer a 721 DDC, and query its DDC ID
+    //Mint a DDC and query its DDC ID
     void mint() throws Exception {
         String tx = getDDC721Service().mint(consumerAddress, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63");
         log.info(tx);
@@ -75,7 +75,7 @@
 
     }
     
-    //流转DDC
+    //Transfer the DDC
      void transferFrom() throws Exception {
         String tx = getDDC721Service().transferFrom(address, "0xb0031Aa7725A6828BcCE4F0b90cFE451C31c1e63", "0x5c5101afe03b416b9735f40ddc3ba7b0c354a5a0", new BigInteger("1"));
         log.info(tx);
