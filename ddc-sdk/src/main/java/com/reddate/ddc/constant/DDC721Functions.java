@@ -3,7 +3,7 @@ package com.reddate.ddc.constant;
 /**
  * @author wxq
  * @create 2021/12/9 10:51
- * @description DDC-721 合约方法
+ * @description DDC-721 contract functions
  */
 public class DDC721Functions {
     public static final String MINT = "mint";
