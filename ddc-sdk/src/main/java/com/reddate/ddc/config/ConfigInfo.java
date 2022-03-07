@@ -9,7 +9,7 @@ public class ConfigInfo {
 
 	private String opbGatewayAddress = "";
 
-	//开放联盟链网关启用x-api-key后需设置将该值
+	//Configure this parameter after the Open Permissioned Blockchain gateway enabling x-api-key in the request headers
 	private String apiKey = "";
 
 	private String ddc721ABI;
