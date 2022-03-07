@@ -7,8 +7,8 @@ public class DDC1155Functions {
     public static final String IsApprovedForAll = "isApprovedForAll";
     public static final String SafeTransferFrom = "safeTransferFrom";
     public static final String SafeBatchTransferFrom = "safeBatchTransferFrom";
-    public static final String Freeze  = "freeze";
-    public static final String UnFreeze  = "unFreeze";
+    public static final String Freeze = "freeze";
+    public static final String UnFreeze = "unFreeze";
     public static final String Burn = "burn";
     public static final String BurnBatch = "burnBatch";
     public static final String BalanceOf = "balanceOf";
