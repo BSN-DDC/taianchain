@@ -7,7 +7,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.6.0</version>
-		<relativePath />
+		<relativePath/>
 	</parent>
 	<groupId>org.reddate.ddc</groupId>
 	<artifactId>ddc-sdk-taian</artifactId>
