@@ -1,7 +1,7 @@
 package com.reddate.ddc.constant;
 
 public class AuthorityFunctions {
-//    public static final String AddAccount = "addAccountByPlatform";
+//    public static final String AddAccount = "addAccountByPlatform"; 
 
     public static final String AddAccountByOperator = "addAccountByOperator";
 
