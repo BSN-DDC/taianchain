@@ -90,7 +90,7 @@ class BaseServiceTest {
     static DDCSdkClient ddcSdkClient;
     static {
 
-        ddcSdkClient = new DDCSdkClient("https://opbningxia.bsngate.com:18602/api/55ab0892b6524fb1b3121b9309844576/rpc");
+        ddcSdkClient = new DDCSdkClient("https://opbningxia.bsngate.com:18602/api/[project_id]/rpc/");
         Secp256K1SignEventListener signEventListener = null;
         try {
             // 设置签名使用的公私钥
