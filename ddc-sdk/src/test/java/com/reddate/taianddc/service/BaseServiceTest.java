@@ -121,6 +121,10 @@ class BaseServiceTest {
     public DDC1155Service getDDC1155Service() {
         return ddcSdkClient.getDDC1155Service();
     }
+
+    public OpbCrossChainService getOpbCrossChainService() {
+        return ddcSdkClient.getOpbCrossChainService();
+    }
     //endregion
 
     /**

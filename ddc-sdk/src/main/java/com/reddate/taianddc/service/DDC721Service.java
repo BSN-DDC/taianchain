@@ -73,7 +73,7 @@ public class DDC721Service extends BaseService {
 
         ArrayList<Object> arrayList = new ArrayList<>();
         arrayList.add(to);
-        arrayList.add(ddcURIs.stream().map(String::valueOf).collect(Collectors.joining(",")));
+        arrayList.add(ddcURIs);
 
         ReqJsonRpcBean reqJsonRpcBean = assembleDDC721Transaction(sender, DDC721Functions.MINT_BATCH, arrayList);
         RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);

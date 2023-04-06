@@ -26,6 +26,7 @@ public class TransactionRecepitBean {
     private String output;
     private String root;
     private String status;
+    private String statusMsg;
     private String to;
     private String transactionHash;
     private String transactionIndex;

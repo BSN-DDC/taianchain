@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.reddate.taianddc.config.ConfigCache;
 import lombok.extern.slf4j.Slf4j;
 import org.fisco.bcos.web3j.utils.Strings;
+import org.slf4j.MDC;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
 import org.springframework.util.LinkedMultiValueMap;
@@ -31,6 +32,9 @@ public class RestTemplateUtil {
 
         if (!Strings.isEmpty(ConfigCache.get().getApiKey())) {
             header.set("x-api-key",ConfigCache.get().getApiKey());
+        }
+        if (MDC.get("traceId") != null) {
+            header.set("trace_id", MDC.get("traceId"));
         }
 
         String value = JSONObject.toJSONString(params);

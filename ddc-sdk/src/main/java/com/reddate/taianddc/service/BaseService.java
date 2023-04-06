@@ -1,6 +1,7 @@
 package com.reddate.taianddc.service;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.reddate.taianddc.config.ConfigCache;
 import com.reddate.taianddc.constant.ErrorMessage;
 import com.reddate.taianddc.constant.FiscoFunctions;
@@ -14,12 +15,15 @@ import com.reddate.taianddc.util.HexUtils;
 import com.reddate.taianddc.util.SignedTransactionsUtils;
 import com.reddate.taianddc.util.http.RestTemplateUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.fisco.bcos.web3j.abi.datatypes.Function;
 import org.fisco.bcos.web3j.crypto.gm.sm2.util.encoders.Hex;
 import org.fisco.bcos.web3j.protocol.exceptions.TransactionException;
 import org.fisco.bcos.web3j.tx.txdecode.BaseException;
 import org.fisco.bcos.web3j.tx.txdecode.InputAndOutputResult;
 import org.fisco.bcos.web3j.utils.Strings;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.utils.Numeric;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
@@ -35,6 +39,17 @@ public class BaseService {
     public static final String ZeroAddress = "0x0000000000000000000000000000000000000000";
     // 任意地址，用以发送call
     public static final String OneAddress = "0x0000000000000000000000000000000000000001";
+
+    private static final String SYSTEM_ACCOUNT_ABI = "[{\"constant\":false,\"inputs\":[{\"name\":\"userAccount\",\"type\":\"address\"},{\"name\":\"gasValue\",\"type\":\"uint256\"}],\"name\":\"deduct\",\"outputs\":[{\"name\":\"\",\"type\":\"int256\"},{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"chargerAccount\",\"type\":\"address\"}],\"name\":\"revokeCharger\",\"outputs\":[{\"name\":\"\",\"type\":\"int256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"userAccount\",\"type\":\"address\"},{\"name\":\"gasValue\",\"type\":\"uint256\"}],\"name\":\"charge\",\"outputs\":[{\"name\":\"\",\"type\":\"int256\"},{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"listChargers\",\"outputs\":[{\"name\":\"\",\"type\":\"address[]\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"name\":\"chargerAccount\",\"type\":\"address\"}],\"name\":\"grantCharger\",\"outputs\":[{\"name\":\"\",\"type\":\"int256\"}],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"name\":\"userAccount\",\"type\":\"address\"}],\"name\":\"queryRemainGas\",\"outputs\":[{\"name\":\"\",\"type\":\"int256\"},{\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}]";
+    private static final String SYSTEM_ACCOUNT_ADDRESS = "0x0000000000000000000000000000000000001009";
+
+    public BaseService() {
+    }
+
+    public BaseService(SignEventListener signEventListener) {
+        this.signEventListener = signEventListener;
+    }
+
     /**
      * 组装交易
      *
@@ -397,5 +412,40 @@ public class BaseService {
             log.error("callResultCheck {}",respCallRpcBean.getStatus());
             throw new DDCException(ErrorMessage.REQUEST_FAILED.getCode(), respCallRpcBean.toString());
         }
+    }
+
+    /**
+     * The platform party or end user can query the GAS fee balance corresponding to the chain account through this method.
+     *
+     * @param account Hex format account
+     * @return GAS balance
+     */
+    public BigInteger balanceOfGas(String account) throws Exception {
+        this.checkAccountAddress(account);
+
+        BigInteger balance = null;
+        // Send transaction.
+        ArrayList<Object> params = new ArrayList<>();
+        params.add(account);
+
+        ReqJsonRpcBean reqJsonRpcBean = assembleTransaction(OneAddress, this.getBlockNumber(), SYSTEM_ACCOUNT_ABI, SYSTEM_ACCOUNT_ADDRESS, "queryRemainGas", params);
+        RespJsonRpcBean respJsonRpcBean = restTemplateUtil.sendPost(ConfigCache.get().getOpbGatewayAddress(), reqJsonRpcBean, RespJsonRpcBean.class);
+        // Check result.
+        this.resultCheck(respJsonRpcBean);
+
+        String encodeParams = new ObjectMapper().writeValueAsString(reqJsonRpcBean.getParams().get(1));
+        ReqCallRpcBean reqCallRpcBean = JSONObject.parseObject(encodeParams, ReqCallRpcBean.class);
+        String encodedFunction = reqCallRpcBean.getData();
+        String jsonResult = new ObjectMapper().writeValueAsString(respJsonRpcBean.getResult());
+        RespCallRpcBean respCallRpcBean = JSONObject.parseObject(jsonResult, RespCallRpcBean.class);
+        this.callResultCheck(respCallRpcBean);
+
+        InputAndOutputResult inputAndOutputResult = AnalyzeChainInfoUtils.analyzeTransactionOutput(SYSTEM_ACCOUNT_ABI, "", encodedFunction, respCallRpcBean.getOutput());
+        String value = inputAndOutputResult.getResult().get(1).getData().toString();
+
+        if (StringUtils.isNotEmpty(value)) {
+            balance = new BigInteger(value);
+        }
+        return balance;
     }
 }

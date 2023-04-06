@@ -7,10 +7,11 @@
     - [3.BSN-DDC-费用管理](#3.BSN-DDC-费用管理)
     - [4.BSN-DDC-721](#4.BSN-DDC-721)
     - [5.BSN-DDC-1155](#5.BSN-DDC-1155)
-    - [6.BSN-DDC-交易查询](#6.BSN-DDC-交易查询)
-    - [7.BSN-DDC-区块查询](#7.BSN-DDC-区块查询)
-    - [8.BSN-DDC-数据解析](#8.BSN-DDC-数据解析)
-    - [9.离线账户创建](#9.离线账户创建)
+    - [6.BSN-DDC-开放联盟链跨链](#6.BSN-DDC-开放联盟链跨链)
+    - [7.BSN-DDC-交易查询](#7.BSN-DDC-交易查询)
+    - [8.BSN-DDC-区块查询](#8.BSN-DDC-区块查询)
+    - [9.BSN-DDC-数据解析](#9.BSN-DDC-数据解析)
+    - [10.离线账户创建](#10.离线账户创建)
     - [测试用例](#测试用例)
 
 ### 合约地址信息
@@ -20,6 +21,7 @@
  计费代理合约地址 ： 0x9f186dDea266dB25fd76BF939de538eC60650e31
  DDC 721代理合约地址 ： 0xea485bb4015fd341D917215df98DC53e8b204FeF
  DDC 1155代理合约地址 ： 0x83B61cf8B17e5f2f15E9230e1CAFd036A800e602
+ DDC 开放联盟链跨链合约地址：0x6759a28863f1cc62Ef7ECf06c0356baD78Fd4041
 ```
 
 ### 1.初始化DDCSdkClient
@@ -460,7 +462,28 @@
     ddc1155Service.metaBurn(sender, owner, ddcId, amount, data, nonce, deadline, sign);
 ```
 
-### 6.BSN-DDC-交易查询
+### 6.BSN-DDC-开放联盟链跨链
+
+```
+    // 泰安链签名账户地址
+    String sender = "0x057b5061c4e2ebce5482b63def1de5a21a66d1f6";
+    // DDC类型
+    DDCType ddcType = DDCType.TYPE_721;
+    // 目标链接收者账户地址
+    String to = "0x057b5061c4e2ebce5482b63def1de5a21a66d1f6";
+    // DDC唯一标识
+    BigInteger ddcId = BigInteger.valueOf(2987);
+    // 是否锁定
+    Boolean isLock = true;
+    // 附加数据
+    String data = "0x";
+    // 目标链chainId
+    BigInteger toChainID = BigInteger.valueOf(2);
+    // 调用跨链方法发起跨链交易
+    String txHash = ddcSdkClient.getOpbCrossChainService().crossChainTransfer(sender, ddcType, ddcId, isLock, toChainID, to, data);
+```
+
+### 7.BSN-DDC-交易查询
 
 ```
     BaseService baseService = new BaseService();
@@ -486,7 +509,7 @@
      BigInteger nonce = baseService.getTransactionCount(address);
 ```
 
-### 7.BSN-DDC-区块查询
+### 8.BSN-DDC-区块查询
 
 ```
     BaseService baseService = new BaseService();
@@ -495,7 +518,7 @@
     EthBlock.Block blockinfo = baseService.getBlockByNumber(blockNumber)
 ```
 
-### 8.BSN-DDC-数据解析
+### 9.BSN-DDC-数据解析
 
 ```
 3.1.9    BSN-DDC-数据解析
@@ -565,7 +588,7 @@
     });
 ```
 
-### 9.离线账户创建
+### 10.离线账户创建
 
 ```
     // 返回包含助记词，公钥，私钥，pem格式地址的Account对象
@@ -592,3 +615,5 @@
 [PemUtilTest.java](src/test/java/com/reddate/taianddc/util/crypto/PemUtilTest.java)
 
 [CrossChainServiceTest.java](src/test/java/com/reddate/taianddc/service/CrossChainServiceTest.java)
+
+[OpbCrossChainServiceTest.java](src/test/java/com/reddate/taianddc/service/OpbCrossChainServiceTest.java)

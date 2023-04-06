@@ -59,7 +59,10 @@ public enum ErrorMessage {
     CROSS_CHAIN_ID_IS_WRONG(1049, "cross chain id type is wrong"),
     DDCS_IS_EMPTY(1050, "ddcs is empty"),
     DDCS_OWNER_IS_EMPTY(1051, "ddcs owner is empty"),
-
+    ISLOCK_IS_EMPTY(1052, "islock is empty"),
+    CROSS_CHAIN_STATE_IS_EMPTY(1053, "cross chain state is empty"),
+    ILLEGAL_STATE_PARAMETER(1054, "illegal state parameter"),
+    REMARK_IS_EMPTY(1055, "remark is empty"),
     REQUEST_FAILED(2001, ""),
     ;
 

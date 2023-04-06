@@ -27,7 +27,11 @@ public class DDCSdkClient {
 	public void registerSignListener(SignEventListener signEventListener) {
 		this.signEventListener = signEventListener;
 	}
-	
+
+	public BaseService getBaseService() {
+		return new BaseService(signEventListener);
+	}
+
 	/**
 	 * 获取权限管理服务的示例
 	 * 
@@ -80,5 +84,8 @@ public class DDCSdkClient {
 	public DDC1155MetaTransaction getDDC1155MetaTransaction() {
 		return DDC1155MetaTransaction.builder().setChainId(new BigInteger("1")).setContractAddress(ConfigCache.get().getDdc1155Address()).build();
 	}
-	
+
+	public OpbCrossChainService getOpbCrossChainService() {
+		return new OpbCrossChainService(signEventListener);
+	}
 }

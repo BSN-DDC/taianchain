@@ -216,6 +216,11 @@ public class SignedTransactionsUtils {
                 List<Object> arrList = new ArrayList(Arrays.asList(params.get(i).toString().split(",", -1)));
                 List<Type> arrParams = new ArrayList();
 
+                // 兼容json，避免,分隔json属性
+                if (ArrayList.class.isInstance(params.get(i))) {
+                    arrList = (ArrayList<Object>)params.get(i);
+                }
+
                 for(int j = 0; j < arrList.size(); ++j) {
                     inputType = (Class<? extends Type>) AbiTypes.getType(((String)funcInputTypes.get(i)).substring(0, ((String)funcInputTypes.get(i)).indexOf("[")));
                     input = ContractTypeUtil.parseByType(((String)funcInputTypes.get(i)).substring(0, ((String)funcInputTypes.get(i)).indexOf("[")), arrList.get(j).toString());

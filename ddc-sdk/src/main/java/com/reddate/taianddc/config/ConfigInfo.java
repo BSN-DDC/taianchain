@@ -40,6 +40,12 @@ public class ConfigInfo {
 
 	private String crossChainLogicBIN;
 
+	private String opbCrossChainAddress;
+
+	private String opbCrossChainABI;
+
+	private String opbCrossChainBIN;
+
 	private Long queryRecepitWaitTime = 300L;
 
 	private Integer queryRecepitRetryCount = 20;
@@ -202,5 +208,29 @@ public class ConfigInfo {
 
 	public void setCrossChainLogicBIN(String crossChainLogicBIN) {
 		this.crossChainLogicBIN = crossChainLogicBIN;
+	}
+
+	public String getOpbCrossChainAddress() {
+		return opbCrossChainAddress;
+	}
+
+	public void setOpbCrossChainAddress(String opbCrossChainAddress) {
+		this.opbCrossChainAddress = opbCrossChainAddress;
+	}
+
+	public String getOpbCrossChainABI() {
+		return opbCrossChainABI;
+	}
+
+	public void setOpbCrossChainABI(String opbCrossChainABI) {
+		this.opbCrossChainABI = opbCrossChainABI;
+	}
+
+	public String getOpbCrossChainBIN() {
+		return opbCrossChainBIN;
+	}
+
+	public void setOpbCrossChainBIN(String opbCrossChainBIN) {
+		this.opbCrossChainBIN = opbCrossChainBIN;
 	}
 }

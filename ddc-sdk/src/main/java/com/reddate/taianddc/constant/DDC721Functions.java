@@ -45,7 +45,7 @@ public class DDC721Functions {
     public static final String DDC_721_META_TRANSFER_BATCH_EVENT = "MetaTransferBatch(address,address,address,uint256[])";
     public static final String DDC_721_FREEZE_EVENT = "EnterBlacklist(address,uint256)";
     public static final String DDC_721_UN_FREEZE_EVENT = "ExitBlacklist(address,uint256)";
-    public static final String DDC_721_SET_URI_EVENT = "SetURI(address,uint256,string)";
+    public static final String DDC_721_SET_URI_EVENT = "SetURI(uint256,string)";
     public static final String DDC_721_APPROVE_BATCH_EVENT = "ApprovalBatch(address[],address,uint256[])";
 
 }
